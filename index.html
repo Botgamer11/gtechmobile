@@ -3,315 +3,709 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATRIUM : Календ...</title>
+    <title>Gtech Mobile : Календарь</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --bg-color: #f5f5f5;
-            --card-color: #ffffff;
-            --text-color: #333333;
-            --border-color: #dddddd;
+            --primary: #6C5CE7;
+            --primary-dark: #5649C0;
+            --secondary: #00B894;
+            --dark: #2D3436;
+            --light: #F5F6FA;
+            --gray: #636E72;
+            --danger: #D63031;
+            --warning: #FDCB6E;
+            --white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
-        
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
         .container {
             max-width: 100%;
-            padding: 15px;
+            padding: 16px;
+            margin: 0 auto;
         }
-        
+
         .header {
             text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            padding: 12px 0;
+        }
+
+        .user-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 20px;
-            color: var(--secondary-color);
+            box-shadow: var(--shadow);
+            text-align: center;
         }
-        
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: bold;
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: block;
+            object-fit: cover;
+            background-color: var(--light);
         }
-        
-        .card {
-            background-color: var(--card-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--primary);
         }
-        
+
+        .user-username {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .balance {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+        }
+
+        .balance-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
         .btn {
             display: block;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-weight: bold;
-            border: none;
             width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
         }
-        
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
         .btn-secondary {
-            background-color: var(--secondary-color);
+            background-color: var(--secondary);
+            color: var(--white);
         }
-        
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 15px 0;
+            gap: 12px;
+            margin: 16px 0;
         }
-        
+
         .grid-item {
-            background-color: var(--card-color);
-            border-radius: 8px;
+            background: var(--white);
+            border-radius: 12px;
             padding: 12px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
+        .grid-item-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 16px;
+            padding: 8px 0;
+        }
+
         .bonus-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin: 15px 0;
+            gap: 10px;
+            margin: 16px 0;
         }
-        
+
         .bonus-day {
-            background-color: var(--card-color);
-            border-radius: 8px;
-            padding: 10px;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 12px 8px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
         }
-        
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #7f8c8d;
-            font-size: 0.8em;
+
+        .bonus-day.active {
+            border-color: var(--secondary);
+            background-color: rgba(0, 184, 148, 0.1);
         }
-        
-        .user-balance {
-            text-align: center;
-            margin: 15px 0;
-            font-size: 1.1em;
+
+        .bonus-day-value {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 4px;
         }
-        
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
         .tab-container {
             display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #eee;
+            margin-bottom: 16px;
         }
-        
+
         .tab {
-            padding: 10px 15px;
+            padding: 12px 16px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: var(--gray);
+            position: relative;
         }
-        
+
         .tab.active {
-            border-bottom: 3px solid var(--primary-color);
-            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--gray);
+            font-size: 14px;
+            padding: 16px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .bonus-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>ATRIUM : Календ...</h1>
+        <div id="app">
+            <!-- Контент будет загружаться динамически -->
         </div>
-        
-        <div id="content">
-            <!-- Контент будет динамически меняться -->
-        </div>
-        
         <div class="footer">
-            Powered by Atrium Online
+            Powered by Gtech Mobile
         </div>
     </div>
-    
+
     <script>
         // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Основные страницы приложения
-        const pages = {
-            main: `
-                <div class="user-balance">
-                    <p>ВАШ БАЛАНС: 10</p>
-                    <p>БИЛЕТОВ: 0</p>
-                </div>
-                
-                <a href="#" onclick="loadPage('download')" class="btn">СКАЧАТЬ ИГРУ</a>
-                <a href="#" onclick="loadPage('gift')" class="btn">ПОЛУЧИТЬ ПОДАРОК</a>
-                
-                <div class="card">
-                    <h3>ТОП АКТИВНЫХ ИГРОКОВ</h3>
-                    <a href="#" onclick="loadPage('shop')" class="btn btn-secondary">МАГАЗИН ИГРОВЫХ ТОВАРОВ</a>
-                </div>
-                
-                <div class="card">
-                    <h3>БОНУСНЫЕ МОНЕТЫ</h3>
-                    <div class="grid">
-                        <a href="#" onclick="loadPage('storage')" class="grid-item">ХРАНИЛИЩЕ ПРЕДМЕТОВ</a>
-                        <a href="#" onclick="loadPage('promo')" class="grid-item">ВВЕСТИ ПРОМОКОД</a>
-                        <a href="#" onclick="loadPage('vk')" class="grid-item">ПРИВЯЗАТЬ ВК АККАУНТ</a>
-                        <a href="#" onclick="loadPage('settings')" class="grid-item">НАСТРОЙКИ</a>
-                    </div>
-                </div>
-            `,
-            
-            download: `
-                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
-                <h2>КАК НАЧАТЬ ИГРАТЬ</h2>
-                <div class="card">
-                    <p>ЧТОБЫ НАЧАТЬ ИГРАТЬ НА НАШЕМ ПРОЕКТЕ - НЕОБХОДИМО СКАЧАТЬ И УСТАНОВИТЬ ЛАУНЧЕР И ЗАПУСТИТЬ ЕГО, ВСЮ ЗАГРУЗКУ И УСТАНОВКУ ИГРЫ ЛАУНЧЕР СДЕЛАЕТ САМ</p>
-                    <p>СКАЧАЙ И УСТАНОВИ ЛАУНЧЕР, ДОЖДИСЬ ЗАГРУЗКИ ФАЙЛОВ И НАЧНИ ИГРАТЬ!</p>
-                </div>
-                
-                <h3>1. ТЕLEGRAM</h3>
-                <div class="grid">
-                    <a href="#" class="grid-item">APP GALLERY</a>
-                    <a href="#" class="grid-item">RUSTORE</a>
-                    <a href="#" class="grid-item">APK</a>
-                </div>
-                
-                <h3>2. GOOGLE PLAY</h3>
-                <div class="card">
-                    <p><strong>TYPE:</strong> TPE5VETC9 ANDROID 61 / IOS 13 И ВЫШЕ</p>
-                </div>
-            `,
-            
-            promo: `
-                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
-                <h2>ВВЕСТИ ПРОМОКОД</h2>
-                <div class="card">
-                    <p>Введите ваш промокод</p>
-                    <p>Например, 1aA2-3bB4</p>
-                    <input type="text" placeholder="Введите промокод" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 5px;">
-                    <button class="btn">ПРИМЕНИТЬ</button>
-                </div>
-            `,
-            
-            bonus: `
-                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
-                <h2>БОНУСНЫЕ МОНЕТЫ</h2>
-                <div class="card">
-                    <p>Заходите каждый день и забирайте бонусы.</p>
-                    <h3>ЕЖЕДНЕВНЫЙ БОНУС</h3>
-                    <strong>ЗА ПОДПИСКУ</strong>
-                    
-                    <button class="btn">ЗАБРАТЬ</button>
-                    
-                    <div class="bonus-grid">
-                        <div class="bonus-day">1 ДЕНЬ<br>5</div>
-                        <div class="bonus-day">2 ДЕНЬ<br>10</div>
-                        <div class="bonus-day">3 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">4 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">5 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">6 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">7 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">8 ДЕНЬ<br>15</div>
-                        <div class="bonus-day">9 ДЕНЬ +<br>15</div>
-                    </div>
-                </div>
-            `,
-            
-            shop: `
-                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
-                <h2>МАГАЗИН ИГРОВЫХ ТОВАРОВ</h2>
-                <div class="card">
-                    <p>Все выводы товаров происходят каждый понедельник с 00:00 до 23:00</p>
-                </div>
-                
-                <div class="tab-container">
-                    <div class="tab active" onclick="loadShopTab('auction')">АУКЦИОН ТОВАРОВ</div>
-                    <div class="tab" onclick="loadShopTab('shop')">МАГАЗИН ТОВАРОВ</div>
-                </div>
-                
-                <div id="shop-content">
-                    <div class="card">
-                        <h3>УНИКАЛЬНЫЙ ТРАНСПОРТ</h3>
-                        <h3>УНИКАЛЬНЫЕ ПРЕДМЕТЫ</h3>
-                    </div>
-                    <div class="card">
-                        <h3>ВИРТУАЛЬНАЯ ВАЛЮТА</h3>
-                        <h3>УНИКАЛЬНЫЕ СКИНЫ</h3>
-                    </div>
-                </div>
-            `,
-            
-            settings: `
-                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
-                <h2>НАСТРОЙКИ</h2>
-                <div class="card">
-                    <table style="width: 100%;">
-                        <tr>
-                            <td>Игровой логин:</td>
-                            <td>2025-06-17</td>
-                        </tr>
-                        <tr>
-                            <td>Дата регистрации:</td>
-                            <td>0 ШТ</td>
-                        </tr>
-                        <tr>
-                            <td>Лайков:</td>
-                            <td>0 ШТ</td>
-                        </tr>
-                        <tr>
-                            <td>Комментариев:</td>
-                            <td>0 ШТ</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div class="card">
-                    <strong>ПРИВЯЗАТЬ ВК АККАУНТ</strong><br>
-                    <span>НЕ ПРИВЯЗАН</span>
-                    <button class="btn">ПРИВЯЗАТЬ</button>
-                </div>
-            `,
-            
-            // Другие страницы...
+        // Для тестирования в браузере (удалить в продакшене)
+        if (window.location.href.includes('file://') || window.location.href.includes('localhost')) {
+            tg.initData = `user=${JSON.stringify({
+                id: 123456789,
+                first_name: 'Иван',
+                last_name: 'Петров',
+                username: 'ivan_petrov',
+                language_code: 'ru',
+                photo_url: 'https://via.placeholder.com/150'
+            })}`;
+        }
+
+        // Состояние приложения
+        const state = {
+            user: {
+                name: tg.initDataUnsafe?.user?.first_name || 'Гость',
+                lastName: tg.initDataUnsafe?.user?.last_name || '',
+                username: tg.initDataUnsafe?.user?.username ? `@${tg.initDataUnsafe.user.username}` : '',
+                photoUrl: tg.initDataUnsafe?.user?.photo_url || '',
+                balance: 10,
+                tickets: 0,
+                registered: new Date().toISOString().split('T')[0],
+                likes: 0,
+                comments: 0,
+                vkLinked: false
+            },
+            currentPage: 'main',
+            promoCode: '',
+            claimedBonuses: [1, 2, 3],
+            activeShopTab: 'auction'
         };
-        
-        // Функция загрузки страницы
-        function loadPage(page) {
-            document.getElementById('content').innerHTML = pages[page] || pages.main;
-        }
-        
-        // Функция для вкладок магазина
-        function loadShopTab(tab) {
-            // Логика переключения вкладок магазина
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+
+        // Страницы приложения
+        const pages = {
+            // Главная страница
+            main: `
+                <div class="page">
+                    <div class="header">
+                        <h1>Gtech Mobile: Календарь</h1>
+                    </div>
+                    
+                    <div class="user-card">
+                        ${state.user.photoUrl ? `
+                            <img src="${state.user.photoUrl}" class="user-avatar" alt="Аватар">
+                        ` : `<div class="user-avatar">👤</div>`}
+                        
+                        <div class="user-name">
+                            ${state.user.name} ${state.user.lastName}
+                        </div>
+                        
+                        ${state.user.username ? `
+                            <div class="user-username">${state.user.username}</div>
+                        ` : ''}
+                        
+                        <div class="balance">
+                            <div>
+                                <div class="balance-value">${state.user.balance}</div>
+                                <div class="balance-label">БАЛАНС</div>
+                            </div>
+                            <div>
+                                <div class="balance-value">${state.user.tickets}</div>
+                                <div class="balance-label">БИЛЕТОВ</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="navigateTo('download')">
+                        СКАЧАТЬ ИГРУ
+                    </button>
+                    
+                    <button class="btn btn-secondary" onclick="navigateTo('gift')">
+                        ПОЛУЧИТЬ ПОДАРОК
+                    </button>
+                    
+                    <div class="card">
+                        <h3 class="card-title">ТОП АКТИВНЫХ ИГРОКОВ</h3>
+                        <button class="btn btn-primary" onclick="navigateTo('shop')">
+                            МАГАЗИН ИГРОВЫХ ТОВАРОВ
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">БОНУСНЫЕ МОНЕТЫ</h3>
+                        <div class="grid">
+                            <div class="grid-item" onclick="navigateTo('storage')">
+                                <div class="grid-item-icon">📦</div>
+                                ХРАНИЛИЩЕ
+                            </div>
+                            <div class="grid-item" onclick="navigateTo('promo')">
+                                <div class="grid-item-icon">🎟️</div>
+                                ПРОМОКОД
+                            </div>
+                            <div class="grid-item" onclick="navigateTo('bonus')">
+                                <div class="grid-item-icon">🎁</div>
+                                БОНУСЫ
+                            </div>
+                            <div class="grid-item" onclick="navigateTo('settings')">
+                                <div class="grid-item-icon">⚙️</div>
+                                НАСТРОЙКИ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
             
-            // Здесь можно добавить загрузку соответствующего контента
+            // Страница загрузки
+            download: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">КАК НАЧАТЬ ИГРАТЬ</h2>
+                    
+                    <div class="card">
+                        <p>Чтобы начать играть на нашем проекте - необходимо скачать и установить лаунчер и запустить его, всю загрузку и установку игры лаунчер сделает сам.</p>
+                        <p>Скачай и установи лаунчер, дождись загрузки файлов и начни играть!</p>
+                    </div>
+                    
+                    <h3 class="card-title">1. TELEGRAM</h3>
+                    <div class="grid">
+                        <div class="grid-item">
+                            <div class="grid-item-icon">📱</div>
+                            APP GALLERY
+                        </div>
+                        <div class="grid-item">
+                            <div class="grid-item-icon">📲</div>
+                            RUSTORE
+                        </div>
+                        <div class="grid-item">
+                            <div class="grid-item-icon">⬇️</div>
+                            APK
+                        </div>
+                    </div>
+                    
+                    <h3 class="card-title">2. GOOGLE PLAY</h3>
+                    <div class="card">
+                        <p><strong>Требования:</strong> ANDROID 6.1 / IOS 13 И ВЫШЕ</p>
+                    </div>
+                </div>
+            `,
+            
+            // Страница промокода
+            promo: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">ВВЕСТИ ПРОМОКОД</h2>
+                    
+                    <div class="card">
+                        <div class="input-group">
+                            <label class="input-label">Введите ваш промокод</label>
+                            <input type="text" class="input-field" placeholder="Например: 1aA2-3bB4" 
+                                   value="${state.promoCode}" 
+                                   oninput="state.promoCode = this.value">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="applyPromoCode()">
+                            ПРИМЕНИТЬ
+                        </button>
+                    </div>
+                </div>
+            `,
+            
+            // Страница бонусов
+            bonus: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">БОНУСНЫЕ МОНЕТЫ</h2>
+                    
+                    <div class="card">
+                        <p>Заходите каждый день и забирайте бонусы.</p>
+                        
+                        <h3 class="card-title">ЕЖЕДНЕВНЫЙ БОНУС</h3>
+                        <p><strong>ЗА ПОДПИСКУ</strong></p>
+                        
+                        <button class="btn btn-secondary" onclick="claimBonus()">
+                            ЗАБРАТЬ БОНУС
+                        </button>
+                        
+                        <div class="bonus-grid">
+                            ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(day => `
+                                <div class="bonus-day ${state.claimedBonuses.includes(day) ? 'active' : ''}">
+                                    ${day} ДЕНЬ
+                                    <div class="bonus-day-value">${day < 4 ? day * 5 : 15}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            // Магазин
+            shop: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">МАГАЗИН ИГРОВЫХ ТОВАРОВ</h2>
+                    
+                    <div class="card">
+                        <p>Все выводы товаров происходят каждый понедельник с 00:00 до 23:00</p>
+                    </div>
+                    
+                    <div class="tab-container">
+                        <div class="tab ${state.activeShopTab === 'auction' ? 'active' : ''}" 
+                             onclick="changeShopTab('auction')">
+                            АУКЦИОН
+                        </div>
+                        <div class="tab ${state.activeShopTab === 'shop' ? 'active' : ''}" 
+                             onclick="changeShopTab('shop')">
+                            МАГАЗИН
+                        </div>
+                    </div>
+                    
+                    ${state.activeShopTab === 'auction' ? `
+                        <div class="card">
+                            <h3 class="card-title">УНИКАЛЬНЫЙ ТРАНСПОРТ</h3>
+                            <p>Специальные транспортные средства для вашего персонажа</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">УНИКАЛЬНЫЕ ПРЕДМЕТЫ</h3>
+                            <p>Эксклюзивные предметы для коллекции</p>
+                        </div>
+                    ` : `
+                        <div class="card">
+                            <h3 class="card-title">ВИРТУАЛЬНАЯ ВАЛЮТА</h3>
+                            <p>Пополните ваш игровой баланс</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">УНИКАЛЬНЫЕ СКИНЫ</h3>
+                            <p>Специальные оформления для персонажа</p>
+                        </div>
+                    `}
+                </div>
+            `,
+            
+            // Настройки
+            settings: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">НАСТРОЙКИ</h2>
+                    
+                    <div class="card">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td>Игровой логин:</td>
+                                <td>${state.user.name} ${state.user.lastName}</td>
+                            </tr>
+                            <tr>
+                                <td>Дата регистрации:</td>
+                                <td>${state.user.registered}</td>
+                            </tr>
+                            <tr>
+                                <td>Лайков:</td>
+                                <td>${state.user.likes} ШТ</td>
+                            </tr>
+                            <tr>
+                                <td>Комментариев:</td>
+                                <td>${state.user.comments} ШТ</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">ПРИВЯЗАТЬ ВК АККАУНТ</h3>
+                        <p>${state.user.vkLinked ? 'Привязан' : 'НЕ ПРИВЯЗАН'}</p>
+                        
+                        <button class="btn ${state.user.vkLinked ? 'btn-secondary' : 'btn-primary'}" 
+                                onclick="${state.user.vkLinked ? '' : 'linkVKAccount()'}">
+                            ${state.user.vkLinked ? 'ОТВЯЗАТЬ' : 'ПРИВЯЗАТЬ'}
+                        </button>
+                    </div>
+                </div>
+            `,
+            
+            // Хранилище
+            storage: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">ХРАНИЛИЩЕ ПРЕДМЕТОВ</h2>
+                    
+                    <div class="card">
+                        <p>Все выводы товаров происходят каждый понедельник с 00:00 до 23:00</p>
+                    </div>
+                    
+                    <div class="grid">
+                        <div class="grid-item">
+                            <div class="grid-item-icon">🏆</div>
+                            МОИ ПРЕДМЕТЫ
+                        </div>
+                        <div class="grid-item">
+                            <div class="grid-item-icon">📤</div>
+                            ВЫВЕСТИ
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            // Подарок
+            gift: `
+                <div class="page">
+                    <a class="back-btn" onclick="navigateTo('main')">
+                        ← Назад
+                    </a>
+                    
+                    <h2 class="card-title">ПОЛУЧИТЬ ПОДАРОК</h2>
+                    
+                    <div class="card">
+                        <p>Для получения подарка выполните следующие действия:</p>
+                        
+                        <div class="grid" style="grid-template-columns: 1fr;">
+                            <div class="grid-item">
+                                <div class="grid-item-icon">💬</div>
+                                ВСТУПИТЬ В БЕСЕДУ
+                                <small>Gtech Mobile#1</small>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-item-icon">📢</div>
+                                ПОДПИСАТЬСЯ НА КАНАЛ
+                                <small>Gtech Mobile CHANNEL</small>
+                            </div>
+                            <div class="grid-item">
+                                <div class="grid-item-icon">👥</div>
+                                ПОДПИСАТЬСЯ НА ГРУППУ
+                                <small>Gtech Mobile– СОТРУДНИЧЕСТВО</small>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="margin-top: 16px;">
+                            ПОЛУЧИТЬ ПОДАРОК
+                        </button>
+                    </div>
+                </div>
+            `
+        };
+
+        // Функции приложения
+        function render() {
+            document.getElementById('app').innerHTML = pages[state.currentPage] || pages.main;
         }
+
+        function navigateTo(page) {
+            state.currentPage = page;
+            render();
+            window.scrollTo(0, 0);
+        }
+
+        function changeShopTab(tab) {
+            state.activeShopTab = tab;
+            render();
+        }
+
+        function applyPromoCode() {
+            if (!state.promoCode) {
+                alert('Введите промокод');
+                return;
+            }
+            
+            alert(`Промокод "${state.promoCode}" применен!`);
+            state.user.balance += 50;
+            render();
+        }
+
+        function claimBonus() {
+            const nextBonus = Math.max(...state.claimedBonuses) + 1;
+            if (nextBonus > 9) {
+                alert('Вы уже получили все бонусы!');
+                return;
+            }
+            
+            state.claimedBonuses.push(nextBonus);
+            state.user.balance += nextBonus < 4 ? nextBonus * 5 : 15;
+            alert(`Бонус за ${nextBonus} день получен!`);
+            render();
+        }
+
+        function linkVKAccount() {
+            state.user.vkLinked = true;
+            alert('Аккаунт ВК успешно привязан!');
+            render();
+        }
+
+        // Инициализация
+        tg.ready();
+        render();
         
-        // Инициализация главной страницы
-        loadPage('main');
-        
-        // Обработка данных от Telegram
+        // Обработка изменения размера окна
         tg.onEvent('viewportChanged', function() {
             tg.expand();
         });
     </script>
 </body>
 </html>
+           
