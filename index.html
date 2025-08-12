@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATRIUM : Календ...</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --bg-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 15px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            display: block;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            border: none;
+            width: 100%;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .grid-item {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .bonus-day {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+        
+        .user-balance {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ATRIUM : Календ...</h1>
+        </div>
+        
+        <div id="content">
+            <!-- Контент будет динамически меняться -->
+        </div>
+        
+        <div class="footer">
+            Powered by Atrium Online
+        </div>
+    </div>
+    
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Основные страницы приложения
+        const pages = {
+            main: `
+                <div class="user-balance">
+                    <p>ВАШ БАЛАНС: 10</p>
+                    <p>БИЛЕТОВ: 0</p>
+                </div>
+                
+                <a href="#" onclick="loadPage('download')" class="btn">СКАЧАТЬ ИГРУ</a>
+                <a href="#" onclick="loadPage('gift')" class="btn">ПОЛУЧИТЬ ПОДАРОК</a>
+                
+                <div class="card">
+                    <h3>ТОП АКТИВНЫХ ИГРОКОВ</h3>
+                    <a href="#" onclick="loadPage('shop')" class="btn btn-secondary">МАГАЗИН ИГРОВЫХ ТОВАРОВ</a>
+                </div>
+                
+                <div class="card">
+                    <h3>БОНУСНЫЕ МОНЕТЫ</h3>
+                    <div class="grid">
+                        <a href="#" onclick="loadPage('storage')" class="grid-item">ХРАНИЛИЩЕ ПРЕДМЕТОВ</a>
+                        <a href="#" onclick="loadPage('promo')" class="grid-item">ВВЕСТИ ПРОМОКОД</a>
+                        <a href="#" onclick="loadPage('vk')" class="grid-item">ПРИВЯЗАТЬ ВК АККАУНТ</a>
+                        <a href="#" onclick="loadPage('settings')" class="grid-item">НАСТРОЙКИ</a>
+                    </div>
+                </div>
+            `,
+            
+            download: `
+                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
+                <h2>КАК НАЧАТЬ ИГРАТЬ</h2>
+                <div class="card">
+                    <p>ЧТОБЫ НАЧАТЬ ИГРАТЬ НА НАШЕМ ПРОЕКТЕ - НЕОБХОДИМО СКАЧАТЬ И УСТАНОВИТЬ ЛАУНЧЕР И ЗАПУСТИТЬ ЕГО, ВСЮ ЗАГРУЗКУ И УСТАНОВКУ ИГРЫ ЛАУНЧЕР СДЕЛАЕТ САМ</p>
+                    <p>СКАЧАЙ И УСТАНОВИ ЛАУНЧЕР, ДОЖДИСЬ ЗАГРУЗКИ ФАЙЛОВ И НАЧНИ ИГРАТЬ!</p>
+                </div>
+                
+                <h3>1. ТЕLEGRAM</h3>
+                <div class="grid">
+                    <a href="#" class="grid-item">APP GALLERY</a>
+                    <a href="#" class="grid-item">RUSTORE</a>
+                    <a href="#" class="grid-item">APK</a>
+                </div>
+                
+                <h3>2. GOOGLE PLAY</h3>
+                <div class="card">
+                    <p><strong>TYPE:</strong> TPE5VETC9 ANDROID 61 / IOS 13 И ВЫШЕ</p>
+                </div>
+            `,
+            
+            promo: `
+                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
+                <h2>ВВЕСТИ ПРОМОКОД</h2>
+                <div class="card">
+                    <p>Введите ваш промокод</p>
+                    <p>Например, 1aA2-3bB4</p>
+                    <input type="text" placeholder="Введите промокод" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--border-color); border-radius: 5px;">
+                    <button class="btn">ПРИМЕНИТЬ</button>
+                </div>
+            `,
+            
+            bonus: `
+                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
+                <h2>БОНУСНЫЕ МОНЕТЫ</h2>
+                <div class="card">
+                    <p>Заходите каждый день и забирайте бонусы.</p>
+                    <h3>ЕЖЕДНЕВНЫЙ БОНУС</h3>
+                    <strong>ЗА ПОДПИСКУ</strong>
+                    
+                    <button class="btn">ЗАБРАТЬ</button>
+                    
+                    <div class="bonus-grid">
+                        <div class="bonus-day">1 ДЕНЬ<br>5</div>
+                        <div class="bonus-day">2 ДЕНЬ<br>10</div>
+                        <div class="bonus-day">3 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">4 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">5 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">6 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">7 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">8 ДЕНЬ<br>15</div>
+                        <div class="bonus-day">9 ДЕНЬ +<br>15</div>
+                    </div>
+                </div>
+            `,
+            
+            shop: `
+                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
+                <h2>МАГАЗИН ИГРОВЫХ ТОВАРОВ</h2>
+                <div class="card">
+                    <p>Все выводы товаров происходят каждый понедельник с 00:00 до 23:00</p>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab active" onclick="loadShopTab('auction')">АУКЦИОН ТОВАРОВ</div>
+                    <div class="tab" onclick="loadShopTab('shop')">МАГАЗИН ТОВАРОВ</div>
+                </div>
+                
+                <div id="shop-content">
+                    <div class="card">
+                        <h3>УНИКАЛЬНЫЙ ТРАНСПОРТ</h3>
+                        <h3>УНИКАЛЬНЫЕ ПРЕДМЕТЫ</h3>
+                    </div>
+                    <div class="card">
+                        <h3>ВИРТУАЛЬНАЯ ВАЛЮТА</h3>
+                        <h3>УНИКАЛЬНЫЕ СКИНЫ</h3>
+                    </div>
+                </div>
+            `,
+            
+            settings: `
+                <a href="#" onclick="loadPage('main')" class="back-btn">Назад</a>
+                <h2>НАСТРОЙКИ</h2>
+                <div class="card">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td>Игровой логин:</td>
+                            <td>2025-06-17</td>
+                        </tr>
+                        <tr>
+                            <td>Дата регистрации:</td>
+                            <td>0 ШТ</td>
+                        </tr>
+                        <tr>
+                            <td>Лайков:</td>
+                            <td>0 ШТ</td>
+                        </tr>
+                        <tr>
+                            <td>Комментариев:</td>
+                            <td>0 ШТ</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <strong>ПРИВЯЗАТЬ ВК АККАУНТ</strong><br>
+                    <span>НЕ ПРИВЯЗАН</span>
+                    <button class="btn">ПРИВЯЗАТЬ</button>
+                </div>
+            `,
+            
+            // Другие страницы...
+        };
+        
+        // Функция загрузки страницы
+        function loadPage(page) {
+            document.getElementById('content').innerHTML = pages[page] || pages.main;
+        }
+        
+        // Функция для вкладок магазина
+        function loadShopTab(tab) {
+            // Логика переключения вкладок магазина
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Здесь можно добавить загрузку соответствующего контента
+        }
+        
+        // Инициализация главной страницы
+        loadPage('main');
+        
+        // Обработка данных от Telegram
+        tg.onEvent('viewportChanged', function() {
+            tg.expand();
+        });
+    </script>
+</body>
+</html>
