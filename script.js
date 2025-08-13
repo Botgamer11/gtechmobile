@@ -1,27 +1,37 @@
-// Инициализация Telegram WebApp
+// script.js
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Бэкенд в JSON формате
+// Инициализация бота
+const bot = {
+    sendData: (data) => {
+        tg.sendData(JSON.stringify(data));
+    },
+    showAlert: (message) => {
+        tg.showAlert(message);
+    }
+};
+
+// Данные приложения
 const backend = {
     creatorId: 6595683709, // Ваш Telegram ID
+    adminIds: [123456789], // Массив ID админов
+    supportLink: "https://t.me/gtech_support_bot",
     promoCodes: [],
     buttons: {
         dailyBonus: "ЕЖЕДНЕВНЫЙ БОНУС",
         getGift: "ПОЛУЧИТЬ ПОДАРОК",
         community: "СООБЩЕСТВО",
         download: "СКАЧАТЬ ИГРУ",
-        adminPanel: "АДМИН ПАНЕЛЬ"
+        adminPanel: "АДМИН ПАНЕЛЬ",
+        back: "НАЗАД",
+        support: "ТЕХ ПОДДЕРЖКА",
+        withdraw: "ВЫВОД СРЕДСТВ",
+        history: "ИСТОРИЯ ВЫВОДОВ"
     },
-    links: {
-        site: "https://gtech-mobile.com",
-        download: "https://gtech-mobile.com/download",
-        forum: "https://forum.gtech-mobile.com",
-        vkGroup: "https://vk.com/gtech_mobile",
-        vkChat: "https://vk.me/join/gtech_chat"
-    },
-    bonuses: [5, 10, 15, 15, 15, 15, 15, 15, 15], // Бонусы как на скриншоте
-    users: {}
+    bonuses: [5, 10, 15, 15, 15, 15, 15, 15, 15],
+    users: {},
+    withdrawalRequests: []
 };
 
 // Состояние приложения
@@ -29,27 +39,47 @@ const state = {
     user: {
         id: tg.initDataUnsafe?.user?.id || 0,
         name: tg.initDataUnsafe?.user?.first_name || 'Гость',
-        balance: 0,
+        username: tg.initDataUnsafe?.user?.username || '',
+        balance: 0, // Начальный баланс для демонстрации
         lastBonusDate: null,
-        claimedBonuses: []
+        claimedBonuses: [],
+        withdrawalHistory: []
     },
     currentPage: 'main',
-    isAdmin: tg.initDataUnsafe?.user?.id === backend.creatorId
+    isAdmin: backend.adminIds.includes(tg.initDataUnsafe?.user?.id),
+    isCreator: tg.initDataUnsafe?.user?.id === backend.creatorId
 };
 
 // Загрузка данных
 function loadData() {
     const savedData = localStorage.getItem('gtech_backend');
-    if (savedData) Object.assign(backend, JSON.parse(savedData));
+    if (savedData) {
+        try {
+            const parsedData = JSON.parse(savedData);
+            Object.assign(backend, parsedData);
+            
+            // Проверяем, есть ли creatorId в adminIds
+            if (!backend.adminIds.includes(backend.creatorId)) {
+                backend.adminIds.push(backend.creatorId);
+            }
+        } catch (e) {
+            console.error("Ошибка загрузки данных:", e);
+        }
+    }
     
     if (!backend.users[state.user.id]) {
         backend.users[state.user.id] = {
             balance: 0,
             lastBonusDate: null,
-            claimedBonuses: []
+            claimedBonuses: [],
+            usedPromoCodes: [],
+            withdrawalHistory: []
         };
     }
+    
     Object.assign(state.user, backend.users[state.user.id]);
+    state.isAdmin = backend.adminIds.includes(state.user.id);
+    state.isCreator = state.user.id === backend.creatorId;
 }
 
 // Сохранение данных
@@ -57,12 +87,15 @@ function saveData() {
     backend.users[state.user.id] = {
         balance: state.user.balance,
         lastBonusDate: state.user.lastBonusDate,
-        claimedBonuses: state.user.claimedBonuses
+        claimedBonuses: state.user.claimedBonuses,
+        usedPromoCodes: state.user.usedPromoCodes || [],
+        withdrawalHistory: state.user.withdrawalHistory || []
     };
+    
     localStorage.setItem('gtech_backend', JSON.stringify(backend));
 }
 
-// Отображение уведомления
+// Уведомления
 function showNotification(message, isError = false) {
     const notification = document.createElement('div');
     notification.className = `notification ${isError ? 'error' : ''}`;
@@ -74,19 +107,18 @@ function showNotification(message, isError = false) {
     }, 3000);
 }
 
-// Навигация по страницам
+// Навигация
 function navigateTo(page) {
     state.currentPage = page;
     render();
     window.scrollTo(0, 0);
 }
 
-// Получение бонуса (обновленная версия)
+// Получение бонуса
 function claimBonus() {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     
-    // Проверка, получал ли пользователь бонус сегодня
     if (state.user.lastBonusDate) {
         const lastDate = new Date(state.user.lastBonusDate);
         const lastDay = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
@@ -97,14 +129,12 @@ function claimBonus() {
         }
     }
     
-    // Определение следующего бонуса
     const nextBonusDay = state.user.claimedBonuses.length + 1;
     if (nextBonusDay > backend.bonuses.length) {
         showNotification('Вы получили все бонусы!', true);
         return;
     }
     
-    // Зачисление бонуса
     const bonusAmount = backend.bonuses[nextBonusDay - 1];
     state.user.balance += bonusAmount;
     state.user.claimedBonuses.push(nextBonusDay);
@@ -113,6 +143,111 @@ function claimBonus() {
     showNotification(`Бонус за ${nextBonusDay} день: +${bonusAmount} монет!`);
     saveData();
     render();
+}
+
+// Модальные окна
+function openModal(content) {
+    const modal = document.getElementById('modal');
+    modal.innerHTML = content;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    const modal = document.getElementById('modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Вывод средств
+function openWithdrawModal() {
+    const modalContent = `
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h3 class="modal-title">ЗАЯВКА НА ВЫВОД</h3>
+            <input type="text" class="input-field" id="withdraw-nickname" 
+                   placeholder="Ваш игровой никнейм" value="${state.user.username || ''}">
+            <input type="number" class="input-field" id="withdraw-amount" 
+                   placeholder="Сумма (до ${state.user.balance})" max="${state.user.balance}">
+            <button class="btn btn-success" onclick="submitWithdraw()">ПОДТВЕРДИТЬ ВЫВОД</button>
+        </div>
+    `;
+    openModal(modalContent);
+}
+
+function submitWithdraw() {
+    const nickname = document.getElementById('withdraw-nickname').value.trim();
+    const amount = parseInt(document.getElementById('withdraw-amount').value);
+    
+    if (!nickname || nickname.length < 3) {
+        showNotification('Никнейм должен содержать минимум 3 символа!', true);
+        return;
+    }
+    
+    if (isNaN(amount) || amount <= 0) {
+        showNotification('Введите корректную сумму!', true);
+        return;
+    }
+    
+    if (amount > state.user.balance) {
+        showNotification('Недостаточно средств на балансе!', true);
+        return;
+    }
+    
+    // Создаем заявку
+    const withdrawalRequest = {
+        id: Date.now(),
+        userId: state.user.id,
+        username: state.user.username,
+        nickname,
+        amount,
+        date: new Date().toISOString(),
+        status: 'pending'
+    };
+    
+    // Добавляем в историю
+    state.user.withdrawalHistory.unshift(withdrawalRequest);
+    backend.withdrawalRequests.unshift(withdrawalRequest);
+    
+    // Списываем средства
+    state.user.balance -= amount;
+    
+    // Отправляем данные боту
+    bot.sendData({
+        type: 'withdrawal',
+        data: withdrawalRequest
+    });
+    
+    showNotification(`Заявка на вывод ${amount} монет отправлена!`);
+    saveData();
+    closeModal();
+    render();
+}
+
+// История выводов
+function openWithdrawHistory() {
+    const historyItems = state.user.withdrawalHistory.map(item => `
+        <div class="withdraw-item">
+            <div><strong>${item.nickname}</strong> • ${new Date(item.date).toLocaleDateString()}</div>
+            <div>Сумма: <span class="withdraw-amount">${item.amount} монет</span>
+                <span class="withdraw-status status-${item.status}">
+                    ${item.status === 'pending' ? 'В обработке' : 
+                      item.status === 'completed' ? 'Выполнено' : 'Отклонено'}
+                </span>
+            </div>
+        </div>
+    `).join('') || '<p style="text-align:center;color:var(--text-gray)">История выводов пуста</p>';
+    
+    const modalContent = `
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h3 class="modal-title">ИСТОРИЯ ВЫВОДОВ</h3>
+            <div class="withdraw-history">
+                ${historyItems}
+            </div>
+        </div>
+    `;
+    openModal(modalContent);
 }
 
 // Админ-функции
@@ -126,31 +261,51 @@ function updateButtonTexts() {
     navigateTo('main');
 }
 
-function updateLinks() {
-    backend.links.site = document.getElementById('link-site').value;
-    backend.links.download = document.getElementById('link-download').value;
-    backend.links.forum = document.getElementById('link-forum').value;
-    backend.links.vkGroup = document.getElementById('link-vk-group').value;
-    backend.links.vkChat = document.getElementById('link-vk-chat').value;
+function updateSupportLink() {
+    backend.supportLink = document.getElementById('support-link').value;
     saveData();
-    showNotification('Ссылки обновлены!');
+    showNotification('Ссылка на поддержку обновлена!');
 }
 
-function addPromoCode() {
-    const code = document.getElementById('promo-code').value;
-    const amount = parseInt(document.getElementById('promo-amount').value);
-    
-    if (!code || isNaN(amount)) {
-        showNotification('Заполните все поля!', true);
+function addAdmin() {
+    const adminId = parseInt(document.getElementById('new-admin-id').value);
+    if (isNaN(adminId)) {
+        showNotification('Введите корректный ID!', true);
         return;
     }
     
-    backend.promoCodes.push({ code, amount });
+    if (backend.adminIds.includes(adminId)) {
+        showNotification('Этот пользователь уже админ!', true);
+        return;
+    }
+    
+    backend.adminIds.push(adminId);
     saveData();
-    showNotification(`Промокод ${code} на ${amount} монет создан!`);
+    showNotification('Админ добавлен!');
+    document.getElementById('new-admin-id').value = '';
+    renderAdminPanel();
 }
 
-// Рендер страниц
+function removeAdmin(adminId) {
+    if (adminId === backend.creatorId) {
+        showNotification('Нельзя удалить создателя!', true);
+        return;
+    }
+    
+    backend.adminIds = backend.adminIds.filter(id => id !== adminId);
+    saveData();
+    showNotification('Админ удален!');
+    renderAdminPanel();
+}
+
+function renderAdminPanel() {
+    if (state.currentPage === 'admin') {
+        const app = document.getElementById('app');
+        app.innerHTML = pages.admin;
+    }
+}
+
+// Страницы приложения
 const pages = {
     main: `
         <div class="page">
@@ -168,6 +323,22 @@ const pages = {
                 ${backend.buttons.getGift}
             </button>
             
+            <button class="btn" onclick="navigateTo('promo')">
+                АКТИВИРОВАТЬ ПРОМОКОД
+            </button>
+            
+            <button class="btn" onclick="openWithdrawModal()">
+                ${backend.buttons.withdraw}
+            </button>
+            
+            <button class="btn" onclick="openWithdrawHistory()">
+                ${backend.buttons.history}
+            </button>
+            
+            <button class="btn" onclick="window.open('${backend.supportLink}', '_blank')">
+                ${backend.buttons.support}
+            </button>
+            
             <div class="card">
                 <h3 class="card-title">${backend.buttons.dailyBonus}</h3>
                 <div class="bonus-grid">
@@ -177,18 +348,6 @@ const pages = {
                             <div class="bonus-day-value">${amount}</div>
                         </div>
                     `).join('')}
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">${backend.buttons.community}</h3>
-                <div class="grid">
-                    <div class="grid-item" onclick="navigateTo('community')">
-                        ФОРУМ И ЧАТЫ
-                    </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.download}', '_blank')">
-                        ${backend.buttons.download}
-                    </div>
                 </div>
             </div>
             
@@ -204,48 +363,84 @@ const pages = {
     
     admin: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
-            <h2 class="card-title">АДМИН ПАНЕЛЬ</h2>
+            <button class="btn back-btn" onclick="navigateTo('main')">
+                ${backend.buttons.back}
+            </button>
+            
+            <div class="card">
+                <h3 class="card-title">Управление админами</h3>
+                <input type="number" class="input-field" id="new-admin-id" placeholder="Telegram ID нового админа">
+                <button class="btn" onclick="addAdmin()">
+                    ДОБАВИТЬ АДМИНА
+                </button>
+                
+                <div class="admin-list">
+                    <h4>Текущие админы:</h4>
+                    ${backend.adminIds.map(id => `
+                        <div class="admin-item">
+                            <div class="admin-info">
+                                <div class="admin-avatar">${id.toString().charAt(0)}</div>
+                                <span>ID: ${id}</span>
+                            </div>
+                            ${id !== backend.creatorId ? `
+                                <button class="btn btn-danger" onclick="removeAdmin(${id})">Удалить</button>
+                            ` : '<span style="color: var(--secondary); font-weight: 600">Создатель</span>'}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Настройки поддержки</h3>
+                <input type="text" class="input-field" id="support-link" 
+                       placeholder="Ссылка на поддержку" value="${backend.supportLink}">
+                <button class="btn" onclick="updateSupportLink()">
+                    ОБНОВИТЬ ССЫЛКУ
+                </button>
+            </div>
             
             <div class="card">
                 <h3 class="card-title">Текст кнопок</h3>
-                <input type="text" class="input-field" id="btn-daily-bonus" placeholder="Ежедневный бонус" value="${backend.buttons.dailyBonus}">
-                <input type="text" class="input-field" id="btn-get-gift" placeholder="Получить подарок" value="${backend.buttons.getGift}">
-                <input type="text" class="input-field" id="btn-community" placeholder="Сообщество" value="${backend.buttons.community}">
-                <input type="text" class="input-field" id="btn-download" placeholder="Скачать игру" value="${backend.buttons.download}">
+                <input type="text" class="input-field" id="btn-daily-bonus" 
+                       placeholder="Ежедневный бонус" value="${backend.buttons.dailyBonus}">
+                <input type="text" class="input-field" id="btn-get-gift" 
+                       placeholder="Получить подарок" value="${backend.buttons.getGift}">
+                <input type="text" class="input-field" id="btn-community" 
+                       placeholder="Сообщество" value="${backend.buttons.community}">
+                <input type="text" class="input-field" id="btn-download" 
+                       placeholder="Скачать игру" value="${backend.buttons.download}">
                 <button class="btn" onclick="updateButtonTexts()">
                     ОБНОВИТЬ ТЕКСТ КНОПОК
                 </button>
             </div>
             
             <div class="card">
-                <h3 class="card-title">Ссылки</h3>
-                <input type="text" class="input-field" id="link-site" placeholder="Официальный сайт" value="${backend.links.site}">
-                <input type="text" class="input-field" id="link-download" placeholder="Скачать игру" value="${backend.links.download}">
-                <input type="text" class="input-field" id="link-forum" placeholder="Форум" value="${backend.links.forum}">
-                <input type="text" class="input-field" id="link-vk-group" placeholder="Группа ВК" value="${backend.links.vkGroup}">
-                <input type="text" class="input-field" id="link-vk-chat" placeholder="Чат ВК" value="${backend.links.vkChat}">
-                <button class="btn" onclick="updateLinks()">
-                    ОБНОВИТЬ ССЫЛКИ
-                </button>
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">Добавить промокод</h3>
-                <input type="text" class="input-field" id="promo-code" placeholder="Промокод">
-                <input type="number" class="input-field" id="promo-amount" placeholder="Количество монет">
-                <button class="btn" onclick="addPromoCode()">
-                    СОЗДАТЬ ПРОМОКОД
-                </button>
+                <h3 class="card-title">Все заявки на вывод</h3>
+                <div class="withdraw-history">
+                    ${backend.withdrawalRequests.slice(0, 5).map(item => `
+                        <div class="withdraw-item">
+                            <div><strong>${item.nickname}</strong> (ID: ${item.userId}) • ${new Date(item.date).toLocaleDateString()}</div>
+                            <div>Сумма: <span class="withdraw-amount">${item.amount} монет</span>
+                                <span class="withdraw-status status-${item.status}">
+                                    ${item.status === 'pending' ? 'В обработке' : 
+                                      item.status === 'completed' ? 'Выполнено' : 'Отклонено'}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('') || '<p style="text-align:center;color:var(--text-gray)">Нет заявок</p>'}
+                </div>
             </div>
         </div>
     `,
     
     bonus: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
-            <h2 class="card-title">${backend.buttons.dailyBonus}</h2>
+            <button class="btn back-btn" onclick="navigateTo('main')">
+                ${backend.buttons.back}
+            </button>
+            
             <div class="card">
+                <h2 class="card-title">${backend.buttons.dailyBonus}</h2>
                 <button class="btn" onclick="claimBonus()">
                     ${backend.buttons.getGift}
                 </button>
@@ -253,46 +448,66 @@ const pages = {
         </div>
     `,
     
-    community: `
+    promo: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
-            <h2 class="card-title">СООБЩЕСТВО</h2>
+            <button class="btn back-btn" onclick="navigateTo('main')">
+                ${backend.buttons.back}
+            </button>
             
             <div class="card">
-                <h3 class="card-title">ОФИЦИАЛЬНЫЕ РЕСУРСЫ</h3>
-                <div class="grid">
-                    <div class="grid-item" onclick="window.open('${backend.links.site}', '_blank')">
-                        ОФИЦИАЛЬНЫЙ САЙТ
-                    </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.forum}', '_blank')">
-                        ФОРУМ
-                    </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.vkChat}', '_blank')">
-                        ЧАТ ВКОНТАКТЕ
-                    </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.vkGroup}', '_blank')">
-                        ГРУППА ВКОНТАКТЕ
-                    </div>
-                </div>
+                <h2 class="card-title">АКТИВАЦИЯ ПРОМОКОДА</h2>
+                <input type="text" class="input-field" id="promo-input" placeholder="Введите промокод">
+                <button class="btn" onclick="usePromoCode()">
+                    АКТИВИРОВАТЬ
+                </button>
             </div>
         </div>
     `
 };
 
-// Рендер текущей страницы
+// Рендер приложения
 function render() {
     const app = document.getElementById('app');
     app.innerHTML = pages[state.currentPage] || pages.main;
     saveData();
 }
 
-// Инициализация приложения
+// Инициализация
 function initApp() {
     loadData();
     render();
     tg.ready();
     
-    tg.onEvent('viewportChanged', () => tg.expand());
+    // Обработка данных от бота
+    tg.onEvent('webAppDataReceived', (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'withdrawal_update') {
+                // Обновляем статус вывода
+                const request = backend.withdrawalRequests.find(r => r.id === data.id);
+                if (request) {
+                    request.status = data.status;
+                    
+                    // Обновляем у пользователя
+                    const userRequest = state.user.withdrawalHistory.find(r => r.id === data.id);
+                    if (userRequest) {
+                        userRequest.status = data.status;
+                    }
+                    
+                    if (data.status === 'rejected') {
+                        // Возвращаем средства при отказе
+                        state.user.balance += request.amount;
+                    }
+                    
+                    saveData();
+                    render();
+                    showNotification(`Статус вывода #${data.id} обновлен: ${data.status}`);
+                }
+            }
+        } catch (e) {
+            console.error("Ошибка обработки данных:", e);
+        }
+    });
 }
 
 initApp();
