@@ -4,8 +4,7 @@ tg.expand();
 
 // Бэкенд в JSON формате
 const backend = {
-    creatorId: 6595683709, // Заменить на ваш Telegram ID
-    admins: [6595683709], // Массив ID администраторов (первый - создатель)
+    creatorId: 123456789, // Ваш Telegram ID
     promoCodes: [],
     buttons: {
         dailyBonus: "ЕЖЕДНЕВНЫЙ БОНУС",
@@ -18,8 +17,8 @@ const backend = {
         site: "https://gtech-mobile.com",
         download: "https://gtech-mobile.com/download",
         forum: "https://forum.gtech-mobile.com",
-        tgGroup: "https://t.me/gtech_group",
-        tgChat: "https://t.me/gtech_chat"
+        vkGroup: "https://vk.com/gtech_mobile",
+        vkChat: "https://vk.me/join/gtech_chat"
     },
     bonuses: [10, 20, 30, 40, 50, 60, 70, 80, 100],
     users: {}
@@ -35,7 +34,7 @@ const state = {
         claimedBonuses: []
     },
     currentPage: 'main',
-    isAdmin: backend.admins.includes(tg.initDataUnsafe?.user?.id)
+    isAdmin: tg.initDataUnsafe?.user?.id === backend.creatorId
 };
 
 // Загрузка данных
@@ -128,8 +127,8 @@ function updateLinks() {
     backend.links.site = document.getElementById('link-site').value;
     backend.links.download = document.getElementById('link-download').value;
     backend.links.forum = document.getElementById('link-forum').value;
-    backend.links.tgGroup = document.getElementById('link-tg-group').value;
-    backend.links.tgChat = document.getElementById('link-tg-chat').value;
+    backend.links.vkGroup = document.getElementById('link-vk-group').value;
+    backend.links.vkChat = document.getElementById('link-vk-chat').value;
     saveData();
     showNotification('Ссылки обновлены!');
 }
@@ -146,54 +145,6 @@ function addPromoCode() {
     backend.promoCodes.push({ code, amount });
     saveData();
     showNotification(`Промокод ${code} на ${amount} монет создан!`);
-}
-
-function addAdmin() {
-    const adminId = parseInt(document.getElementById('admin-id').value);
-    if (isNaN(adminId)) {
-        showNotification('Введите корректный ID!', true);
-        return;
-    }
-    
-    if (backend.admins.includes(adminId)) {
-        showNotification('Этот пользователь уже администратор!', true);
-        return;
-    }
-    
-    backend.admins.push(adminId);
-    saveData();
-    showNotification(`Пользователь ${adminId} добавлен как администратор`);
-    
-    // Обновляем статус текущего пользователя
-    state.isAdmin = backend.admins.includes(state.user.id);
-    render();
-}
-
-function removeAdmin() {
-    const adminId = parseInt(document.getElementById('admin-id').value);
-    if (isNaN(adminId)) {
-        showNotification('Введите корректный ID!', true);
-        return;
-    }
-    
-    if (adminId === backend.creatorId) {
-        showNotification('Нельзя удалить создателя!', true);
-        return;
-    }
-    
-    const index = backend.admins.indexOf(adminId);
-    if (index === -1) {
-        showNotification('Этот пользователь не администратор!', true);
-        return;
-    }
-    
-    backend.admins.splice(index, 1);
-    saveData();
-    showNotification(`Пользователь ${adminId} удалён из администраторов`);
-    
-    // Обновляем статус текущего пользователя
-    state.isAdmin = backend.admins.includes(state.user.id);
-    render();
 }
 
 // Рендер страниц
@@ -270,8 +221,8 @@ const pages = {
                 <input type="text" class="input-field" id="link-site" placeholder="Официальный сайт" value="${backend.links.site}">
                 <input type="text" class="input-field" id="link-download" placeholder="Скачать игру" value="${backend.links.download}">
                 <input type="text" class="input-field" id="link-forum" placeholder="Форум" value="${backend.links.forum}">
-                <input type="text" class="input-field" id="link-tg-group" placeholder="Группа Telegram" value="${backend.links.tgGroup}">
-                <input type="text" class="input-field" id="link-tg-chat" placeholder="Чат Telegram" value="${backend.links.tgChat}">
+                <input type="text" class="input-field" id="link-vk-group" placeholder="Группа ВК" value="${backend.links.vkGroup}">
+                <input type="text" class="input-field" id="link-vk-chat" placeholder="Чат ВК" value="${backend.links.vkChat}">
                 <button class="btn btn-secondary" onclick="updateLinks()">
                     ОБНОВИТЬ ССЫЛКИ
                 </button>
@@ -284,31 +235,6 @@ const pages = {
                 <button class="btn btn-primary" onclick="addPromoCode()">
                     СОЗДАТЬ ПРОМОКОД
                 </button>
-            </div>
-            
-            <div class="card">
-                <h3 class="card-title">Управление администраторами</h3>
-                <input type="number" class="input-field" id="admin-id" placeholder="ID пользователя">
-                <div class="grid">
-                    <button class="btn btn-primary" onclick="addAdmin()">
-                        ДОБАВИТЬ АДМИНА
-                    </button>
-                    <button class="btn btn-danger" onclick="removeAdmin()">
-                        УДАЛИТЬ АДМИНА
-                    </button>
-                </div>
-                
-                <div style="margin-top: 16px;">
-                    <h4>Текущие администраторы:</h4>
-                    <ul class="admin-list">
-                        ${backend.admins.map(id => `
-                            <li>
-                                ID: ${id} ${id === backend.creatorId ? 
-                                    '<span class="creator-badge">(Создатель)</span>' : ''}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
             </div>
         </div>
     `,
@@ -334,20 +260,20 @@ const pages = {
                 <h3 class="card-title">ОФИЦИАЛЬНЫЕ РЕСУРСЫ</h3>
                 <div class="grid">
                     <div class="grid-item" onclick="window.open('${backend.links.site}', '_blank')">
-                        <div class="grid-item-icon">🌐</div>
+                        <div class="grid-item-icon site">🌐</div>
                         ОФИЦИАЛЬНЫЙ САЙТ
                     </div>
                     <div class="grid-item" onclick="window.open('${backend.links.forum}', '_blank')">
-                        <div class="grid-item-icon">💬</div>
+                        <div class="grid-item-icon forum">💬</div>
                         ФОРУМ
                     </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.tgChat}', '_blank')">
-                        <div class="grid-item-icon">📢</div>
-                        ЧАТ TELEGRAM
+                    <div class="grid-item" onclick="window.open('${backend.links.vkChat}', '_blank')">
+                        <div class="grid-item-icon vk">🔵</div>
+                        ЧАТ ВКОНТАКТЕ
                     </div>
-                    <div class="grid-item" onclick="window.open('${backend.links.tgGroup}', '_blank')">
-                        <div class="grid-item-icon">👥</div>
-                        ГРУППА TELEGRAM
+                    <div class="grid-item" onclick="window.open('${backend.links.vkGroup}', '_blank')">
+                        <div class="grid-item-icon vk">👥</div>
+                        ГРУППА ВКОНТАКТЕ
                     </div>
                 </div>
             </div>
