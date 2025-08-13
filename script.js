@@ -11,7 +11,9 @@ const backend = {
         getGift: "ПОЛУЧИТЬ ПОДАРОК",
         community: "СООБЩЕСТВО",
         download: "СКАЧАТЬ ИГРУ",
-        adminPanel: "АДМИН ПАНЕЛЬ"
+        adminPanel: "АДМИН ПАНЕЛЬ",
+        topUsers: "ТОП ИГРОКОВ",
+        enterPromo: "АКТИВИРОВАТЬ ПРОМОКОД"
     },
     links: {
         site: "https://gtech-mobile.com",
@@ -21,7 +23,8 @@ const backend = {
         vkChat: "https://vk.me/join/gtech_chat"
     },
     bonuses: [10, 20, 30, 40, 50, 60, 70, 80, 100],
-    users: {}
+    users: {},
+    admins: []
 };
 
 // Состояние приложения
@@ -34,7 +37,7 @@ const state = {
         claimedBonuses: []
     },
     currentPage: 'main',
-    isAdmin: tg.initDataUnsafe?.user?.id === backend.creatorId
+    isAdmin: tg.initDataUnsafe?.user?.id === backend.creatorId || backend.admins.includes(tg.initDataUnsafe?.user?.id)
 };
 
 // Загрузка данных
@@ -50,6 +53,10 @@ function loadData() {
         };
     }
     Object.assign(state.user, backend.users[state.user.id]);
+    
+    // Проверка на админа
+    state.isAdmin = tg.initDataUnsafe?.user?.id === backend.creatorId || 
+                    backend.admins.includes(tg.initDataUnsafe?.user?.id);
 }
 
 // Сохранение данных
@@ -112,6 +119,41 @@ function claimBonus() {
     render();
 }
 
+// Активация промокода
+function activatePromoCode() {
+    const code = document.getElementById('promo-input').value;
+    if (!code) {
+        showNotification('Введите промокод!', true);
+        return;
+    }
+    
+    const promo = backend.promoCodes.find(p => p.code === code);
+    if (!promo) {
+        showNotification('Промокод не найден!', true);
+        return;
+    }
+    
+    if (promo.activations <= 0) {
+        showNotification('Промокод закончился!', true);
+        return;
+    }
+    
+    if (promo.usedBy && promo.usedBy.includes(state.user.id)) {
+        showNotification('Вы уже активировали этот промокод!', true);
+        return;
+    }
+    
+    state.user.balance += promo.amount;
+    promo.activations -= 1;
+    
+    if (!promo.usedBy) promo.usedBy = [];
+    promo.usedBy.push(state.user.id);
+    
+    showNotification(`Промокод активирован! +${promo.amount} монет`);
+    saveData();
+    render();
+}
+
 // Админ-функции
 function updateButtonTexts() {
     backend.buttons.dailyBonus = document.getElementById('btn-daily-bonus').value;
@@ -136,15 +178,56 @@ function updateLinks() {
 function addPromoCode() {
     const code = document.getElementById('promo-code').value;
     const amount = parseInt(document.getElementById('promo-amount').value);
+    const activations = parseInt(document.getElementById('promo-activations').value);
     
-    if (!code || isNaN(amount)) {
+    if (!code || isNaN(amount) {
         showNotification('Заполните все поля!', true);
         return;
     }
     
-    backend.promoCodes.push({ code, amount });
+    backend.promoCodes.push({ 
+        code, 
+        amount,
+        activations: activations || 1,
+        usedBy: []
+    });
     saveData();
     showNotification(`Промокод ${code} на ${amount} монет создан!`);
+}
+
+function addAdmin() {
+    const adminId = parseInt(document.getElementById('admin-id').value);
+    if (isNaN(adminId)) {
+        showNotification('Введите корректный ID!', true);
+        return;
+    }
+    
+    if (backend.admins.includes(adminId)) {
+        showNotification('Этот пользователь уже админ!', true);
+        return;
+    }
+    
+    backend.admins.push(adminId);
+    saveData();
+    showNotification('Админ добавлен!');
+}
+
+function removeAdmin() {
+    const adminId = parseInt(document.getElementById('admin-id').value);
+    if (isNaN(adminId)) {
+        showNotification('Введите корректный ID!', true);
+        return;
+    }
+    
+    const index = backend.admins.indexOf(adminId);
+    if (index === -1) {
+        showNotification('Этот пользователь не админ!', true);
+        return;
+    }
+    
+    backend.admins.splice(index, 1);
+    saveData();
+    showNotification('Админ удален!');
 }
 
 // Рендер страниц
@@ -165,12 +248,25 @@ const pages = {
             
             <div class="user-card">
                 <div class="user-name">${state.user.name}</div>
-                <div class="balance-value">${state.user.balance} монет</div>
+                <div class="balance-container">
+                    <div class="balance-value">${state.user.balance}</div>
+                    <div class="balance-label">МОНЕТ</div>
+                </div>
             </div>
             
-            <button class="btn btn-primary" onclick="navigateTo('bonus')">
-                ${backend.buttons.getGift}
-            </button>
+            <div class="buttons-container">
+                <button class="btn btn-primary" onclick="navigateTo('bonus')">
+                    ${backend.buttons.getGift}
+                </button>
+                
+                <button class="btn btn-secondary" onclick="navigateTo('promo')">
+                    ${backend.buttons.enterPromo}
+                </button>
+                
+                <button class="btn btn-vk" onclick="navigateTo('top')">
+                    ${backend.buttons.topUsers}
+                </button>
+            </div>
             
             <div class="card">
                 <h3 class="card-title">${backend.buttons.dailyBonus}</h3>
@@ -202,7 +298,7 @@ const pages = {
     
     admin: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
+            <button class="btn btn-secondary" onclick="navigateTo('main')">← Назад</button>
             <h2 class="card-title">АДМИН ПАНЕЛЬ</h2>
             
             <div class="card">
@@ -232,16 +328,30 @@ const pages = {
                 <h3 class="card-title">Добавить промокод</h3>
                 <input type="text" class="input-field" id="promo-code" placeholder="Промокод">
                 <input type="number" class="input-field" id="promo-amount" placeholder="Количество монет">
+                <input type="number" class="input-field" id="promo-activations" placeholder="Количество активаций" value="1">
                 <button class="btn btn-primary" onclick="addPromoCode()">
                     СОЗДАТЬ ПРОМОКОД
                 </button>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Управление админами</h3>
+                <input type="number" class="input-field" id="admin-id" placeholder="Telegram ID пользователя">
+                <div class="grid">
+                    <button class="btn btn-primary" onclick="addAdmin()">
+                        ДОБАВИТЬ АДМИНА
+                    </button>
+                    <button class="btn btn-secondary" onclick="removeAdmin()">
+                        УДАЛИТЬ АДМИНА
+                    </button>
+                </div>
             </div>
         </div>
     `,
     
     bonus: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
+            <button class="btn btn-secondary" onclick="navigateTo('main')">← Назад</button>
             <h2 class="card-title">${backend.buttons.dailyBonus}</h2>
             <div class="card">
                 <button class="btn btn-primary" onclick="claimBonus()">
@@ -251,9 +361,43 @@ const pages = {
         </div>
     `,
     
+    promo: `
+        <div class="page">
+            <button class="btn btn-secondary" onclick="navigateTo('main')">← Назад</button>
+            <h2 class="card-title">АКТИВАЦИЯ ПРОМОКОДА</h2>
+            <div class="card">
+                <input type="text" class="input-field" id="promo-input" placeholder="Введите промокод">
+                <button class="btn btn-primary" onclick="activatePromoCode()">
+                    АКТИВИРОВАТЬ
+                </button>
+            </div>
+        </div>
+    `,
+    
+    top: `
+        <div class="page">
+            <button class="btn btn-secondary" onclick="navigateTo('main')">← Назад</button>
+            <h2 class="card-title">ТОП ИГРОКОВ</h2>
+            <div class="card">
+                <div class="top-list">
+                    ${Object.entries(backend.users)
+                        .sort((a, b) => b[1].balance - a[1].balance)
+                        .slice(0, 10)
+                        .map(([id, user], index) => `
+                            <div class="top-item ${id === state.user.id.toString() ? 'current-user' : ''}">
+                                <span class="top-position">${index + 1}</span>
+                                <span class="top-name">${user.name || `Пользователь ${id}`}</span>
+                                <span class="top-balance">${user.balance} монет</span>
+                            </div>
+                        `).join('')}
+                </div>
+            </div>
+        </div>
+    `,
+    
     community: `
         <div class="page">
-            <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
+            <button class="btn btn-secondary" onclick="navigateTo('main')">← Назад</button>
             <h2 class="card-title">СООБЩЕСТВО</h2>
             
             <div class="card">
