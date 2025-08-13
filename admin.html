@@ -7,22 +7,40 @@
 </head>
 <body>
     <div class="admin-container">
-        <h1>GTECH MOBILE | АДМИН-ПАНЕЛЬ</h1>
+        <h1>Админ-панель Gtech Mobile</h1>
         
         <div class="admin-section">
-            <h2>Создать промокод</h2>
-            <input type="text" id="promoCode" placeholder="Например: GTECH500">
-            <input type="number" id="promoCoins" placeholder="Количество монет">
-            <button class="btn-gradient" onclick="createPromo()">СОЗДАТЬ</button>
+            <h2>Управление промокодами</h2>
+            <input type="text" id="promo-code" placeholder="Промокод">
+            <input type="number" id="promo-amount" placeholder="Количество монет">
+            <input type="number" id="promo-uses" placeholder="Лимит активаций">
+            <button id="create-promo" class="admin-btn">Создать промокод</button>
+            <div id="promo-list" class="promo-list"></div>
         </div>
 
         <div class="admin-section">
-            <h2>Управление админами</h2>
-            <input type="text" id="adminId" placeholder="ID пользователя">
-            <button class="btn-gradient" onclick="addAdmin()">ДОБАВИТЬ</button>
-            <button class="btn-gradient" onclick="removeAdmin()">УДАЛИ</button>
+            <h2>Управление администраторами</h2>
+            <input type="text" id="admin-id" placeholder="ID пользователя">
+            <button id="add-admin" class="admin-btn">Добавить</button>
+            <button id="remove-admin" class="admin-btn">Удалить</button>
+            <div id="admins-list" class="admins-list"></div>
         </div>
+
+        <div class="admin-section">
+            <h2>Настройки интерфейса</h2>
+            <select id="btn-select">
+                <option value="download-btn">Кнопка "Скачать игру"</option>
+                <option value="gift-btn">Кнопка "Получить подарок"</option>
+                <option value="top-btn">Кнопка "Топ игроков"</option>
+            </select>
+            <input type="text" id="btn-text" placeholder="Новый текст">
+            <input type="text" id="btn-link" placeholder="Новая ссылка">
+            <button id="save-btn" class="admin-btn">Сохранить</button>
+        </div>
+
+        <button id="back-btn" class="admin-btn">Назад</button>
     </div>
-    <script src="script.js"></script>
+
+    <script src="admin.js"></script>
 </body>
 </html>

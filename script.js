@@ -1,51 +1,55 @@
+const tg = window.Telegram.WebApp;
+let userData = {};
+
+// Инициализация
+function init() {
+    tg.expand();
+    loadUserData();
+    
+    // Проверка админских прав
+    if (tg.initDataUnsafe.user?.id === 6595683709) { // Замените на ваш ID
+        document.getElementById('admin-btn').style.display = 'block';
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            window.location.href = 'admin.html';
+        });
+    }
+}
+
 // Загрузка данных пользователя
 async function loadUserData() {
-    const response = await fetch("/balance/user1");
-    const data = await response.json();
-    document.getElementById("balance").textContent = data.balance;
+    try {
+        const response = await fetch('/api/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tg.initDataUnsafe)
+        });
+        userData = await response.json();
+        
+        document.getElementById('username').textContent = userData.name;
+        document.getElementById('balance').textContent = userData.balance;
+        document.getElementById('tickets').textContent = userData.tickets;
+    } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+    }
 }
 
 // Активация промокода
-async function activatePromo() {
-    const code = prompt("Введите промокод:");
-    if (!code) return;
-
-    const response = await fetch("/promo/activate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "user1", code })
+async function activatePromo(code) {
+    const response = await fetch('/api/promo/activate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userId: userData.id,
+            code: code
+        })
     });
-
     const result = await response.json();
-    alert(result.error || `Успешно! Баланс: ${result.newBalance}`);
+    return result;
 }
 
-// Вывод средств
-async function requestWithdraw() {
-    const nickname = document.getElementById("nickname").value;
-    const amount = parseInt(document.getElementById("amount").value);
-
-    const response = await fetch("/withdraw", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "user1", nickname, amount })
-    });
-
-    const result = await response.json();
-    alert(result.error || result.status);
-}
-
-// Ежедневный бонус
-async function claimDailyBonus() {
-    const response = await fetch("/bonus/user1", { method: "POST" });
-    const result = await response.json();
-    alert(result.error || `+${result.bonus} монет!`);
-}
-
-// Открыть ссылку
-function openLink(url) {
-    window.open(url, "_blank");
-}
-
-// Загрузка данных при старте
-loadUserData();
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', init);

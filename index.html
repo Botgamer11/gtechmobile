@@ -5,44 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gtech Mobile</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>GTECH MOBILE</h1>
-            <div class="balance">
-                <span>БАЛАНС: <span id="balance">0</span></span>
-                <span>БИЛЕТОВ: <span id="tickets">0</span></span>
+        <header class="profile-header">
+            <h1 id="username">Загрузка...</h1>
+            <div class="balance-info">
+                <span>БАЛАНС: <strong id="balance">0</strong></span>
+                <span>БИЛЕТОВ: <strong id="tickets">0</strong></span>
             </div>
+            <button id="admin-btn" class="admin-btn">⚙️</button>
         </header>
 
-        <div class="buttons">
-            <button class="btn-gradient" onclick="openSection('bonus')">БОНУСНЫЕ МОНЕТЫ</button>
-            <button class="btn-gradient" onclick="openSection('shop')">МАГАЗИН</button>
-            <button class="btn-gradient" onclick="openSection('auction')">АУКЦИОН</button>
-            <button class="btn-gradient" onclick="openSection('withdraw')">ВЫВОД</button>
-            <button class="btn-gradient" onclick="openSection('storage')">ХРАНИЛИЩЕ</button>
-            <button class="btn-gradient" onclick="activatePromo()">ПРОМОКОД</button>
-            <button class="btn-gradient" onclick="openLink('https://vk.com/gtech')">ГРУППА ВК</button>
-            <button class="btn-gradient" onclick="openLink('https://gtech.com/download')">СКАЧАТЬ ИГРУ</button>
+        <div class="main-actions">
+            <button id="download-btn" class="action-btn big-btn">СКАЧАТЬ ИГРУ</button>
+            <button id="gift-btn" class="action-btn big-btn">ПОЛУЧИТЬ ПОДАРОК</button>
         </div>
 
-        <!-- Секция бонусов -->
-        <div id="bonus" class="section hidden">
-            <h2>ЕЖЕДНЕВНЫЙ БОНУС</h2>
-            <p>Заберите +15 монет каждый день!</p>
-            <button class="btn-gradient" onclick="claimDailyBonus()">ЗАБРАТЬ</button>
+        <div class="divider"></div>
+
+        <div class="secondary-actions">
+            <button id="top-btn" class="action-btn">ТОП ИГРОКОВ</button>
+            <button id="shop-btn" class="action-btn">МАГАЗИН</button>
+            <button id="bonus-btn" class="action-btn">БОНУСЫ</button>
+            <button id="withdraw-btn" class="action-btn">ВЫВОД</button>
         </div>
 
-        <!-- Секция вывода -->
-        <div id="withdraw" class="section hidden">
-            <h2>ВЫВОД МОНЕТ</h2>
-            <p>Минимум: 100 монет</p>
-            <input type="text" id="nickname" placeholder="Никнейм">
-            <input type="number" id="amount" placeholder="Сумма">
-            <button class="btn-gradient" onclick="requestWithdraw()">ПОДАТЬ ЗАЯВКУ</button>
-        </div>
+        <footer class="app-footer">
+            <span>Powered by Gtech Mobile</span>
+        </footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

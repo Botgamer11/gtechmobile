@@ -1,58 +1,243 @@
+/* Основные стили */
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    color: white;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
     margin: 0;
     padding: 0;
+    color: #333;
+    line-height: 1.6;
 }
 
-.container, .admin-container {
-    max-width: 600px;
+/* Контейнеры */
+.container {
+    max-width: 100%;
+    padding: 20px;
+    background: white;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.admin-container {
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+    background: white;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
-header {
+/* Шапка профиля */
+.profile-header {
+    position: relative;
     text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
     margin-bottom: 20px;
 }
 
-.balance {
+.profile-header h1 {
+    font-size: 24px;
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+}
+
+.balance-info {
     display: flex;
     justify-content: space-around;
-    margin: 10px 0;
-}
-
-.btn-gradient {
-    background: linear-gradient(45deg, #6a11cb, #2575fc);
-    border: none;
-    color: white;
-    padding: 12px 20px;
-    margin: 8px 0;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    font-weight: bold;
     font-size: 16px;
+    margin-top: 10px;
 }
 
-.section {
-    display: none;
+.balance-info strong {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Кнопки */
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
     text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-.hidden {
-    display: none;
+.big-btn {
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    color: white;
+    font-size: 18px;
+    padding: 15px;
 }
 
-input {
+.big-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #1a252f);
+}
+
+.secondary-actions .action-btn {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.secondary-actions .action-btn:hover {
+    background: #d5dbdb;
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.admin-btn:hover {
+    background: linear-gradient(135deg, #27ae60, #219653);
+}
+
+/* Разделитель */
+.divider {
+    height: 1px;
+    background: #eee;
+    margin: 20px 0;
+}
+
+/* Футер */
+.app-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    color: #95a5a6;
+    font-size: 13px;
+}
+
+/* Админ-панель */
+.admin-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.admin-section h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-section input,
+.admin-section select {
     width: 100%;
     padding: 10px;
-    margin: 8px 0;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    border: none;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-.admin-section {
-    margin-bottom: 20px;
+/* Списки */
+.promo-list,
+.admins-list {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+    background: white;
+}
+
+.promo-item,
+.admin-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.promo-item:last-child,
+.admin-item:last-child {
+    border-bottom: none;
+}
+
+/* Кнопка админа в шапке */
+#admin-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #95a5a6;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    display: none; /* По умолчанию скрыта */
+}
+
+#admin-btn:hover {
+    background: #7f8c8d;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .profile-header h1 {
+        font-size: 20px;
+    }
+    
+    .balance-info {
+        font-size: 14px;
+    }
+    
+    .action-btn {
+        padding: 10px;
+        font-size: 15px;
+    }
+    
+    .big-btn {
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    .admin-section {
+        padding: 15px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.container,
+.admin-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Специальные стили для кнопки "Назад" */
+#back-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    width: 100%;
+    margin-top: 20px;
+}
+
+#back-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a5281b);
 }
