@@ -1,6 +1,5 @@
 const express = require('express');
 const fs = require('fs');
-const crypto = require('crypto');
 const app = express();
 
 app.use(express.json());
@@ -8,6 +7,11 @@ app.use(express.json());
 // Загрузка базы данных
 function loadDB() {
     return JSON.parse(fs.readFileSync('database.json'));
+}
+
+// Сохранение базы данных
+function saveDB(data) {
+    fs.writeFileSync('database.json', JSON.stringify(data, null, 2));
 }
 
 // API для пользователя
@@ -21,7 +25,8 @@ app.post('/api/user', (req, res) => {
             id: userId,
             name: req.body.user?.first_name || 'Гость',
             balance: 0,
-            tickets: 0
+            tickets: 0,
+            lastBonusClaim: null
         };
         db.users.push(user);
         saveDB(db);
@@ -47,5 +52,4 @@ app.post('/api/admin/promo', (req, res) => {
     res.json({ status: 'success' });
 });
 
-// Запуск сервера
 app.listen(3000, () => console.log('Server running on port 3000'));

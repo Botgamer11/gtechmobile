@@ -1,17 +1,19 @@
 {
-  "users": [],
-  "admins": [123456789],
+  "users": [
+    {
+      "id": "123456789",
+      "name": "Ваня",
+      "balance": 10,
+      "tickets": 0,
+      "lastBonusClaim": null
+    }
+  ],
+  "admins": ["123456789"],
   "promoCodes": [],
   "settings": {
-    "buttons": {
-      "download-btn": {
-        "text": "СКАЧАТЬ ИГРУ",
-        "link": "https://gtech.com/download"
-      },
-      "gift-btn": {
-        "text": "ПОЛУЧИТЬ ПОДАРОК",
-        "link": ""
-      }
-    }
+    "minWithdraw": 100,
+    "dailyBonus": 15,
+    "gameLink": "https://gtech.com/download",
+    "giftLink": "https://gtech.com/gift"
   }
 }

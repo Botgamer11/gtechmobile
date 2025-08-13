@@ -4,32 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gtech Mobile</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 15px;
+            background-color: white;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .profile-header h1 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .balance-info {
+            display: flex;
+            justify-content: space-around;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .balance-info span {
+            color: #555;
+        }
+        
+        .balance-info strong {
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .main-actions {
+            margin-bottom: 25px;
+        }
+        
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            background-color: #4a76a8;
+            color: white;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 20px 0;
+        }
+        
+        .secondary-actions .action-btn {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .app-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            color: #777;
+            font-size: 13px;
+        }
+        
+        /* Стиль кнопки как на фото */
+        #admin-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header class="profile-header">
-            <h1 id="username">Загрузка...</h1>
+            <button id="admin-btn">⚙️</button>
+            <h1>ВАНЯ</h1>
             <div class="balance-info">
-                <span>БАЛАНС: <strong id="balance">0</strong></span>
-                <span>БИЛЕТОВ: <strong id="tickets">0</strong></span>
+                <span>ВАШ БАЛАНС: <strong>10</strong></span>
+                <span>БИЛЕТОВ: <strong>0</strong></span>
             </div>
-            <button id="admin-btn" class="admin-btn">⚙️</button>
         </header>
 
         <div class="main-actions">
-            <button id="download-btn" class="action-btn big-btn">СКАЧАТЬ ИГРУ</button>
-            <button id="gift-btn" class="action-btn big-btn">ПОЛУЧИТЬ ПОДАРОК</button>
+            <button class="action-btn">СКАЧАТЬ ИГРУ</button>
+            <button class="action-btn">ПОЛУЧИТЬ ПОДАРОК</button>
         </div>
 
         <div class="divider"></div>
 
         <div class="secondary-actions">
-            <button id="top-btn" class="action-btn">ТОП ИГРОКОВ</button>
-            <button id="shop-btn" class="action-btn">МАГАЗИН</button>
-            <button id="bonus-btn" class="action-btn">БОНУСЫ</button>
-            <button id="withdraw-btn" class="action-btn">ВЫВОД</button>
+            <button class="action-btn">ТОП АКТИВНЫХ ИГРОКОВ</button>
+            <button class="action-btn">МАГАЗИН ИГРОВЫХ ТОВАРОВ</button>
+            <button class="action-btn">БОНУСНЫЕ МОНЕТЫ</button>
         </div>
 
         <footer class="app-footer">
@@ -37,6 +133,22 @@
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        
+        // Показываем кнопку админа только для администраторов
+        if (tg.initDataUnsafe.user?.id === 123456789) { // Замените на ваш ID
+            document.getElementById('admin-btn').style.display = 'block';
+            document.getElementById('admin-btn').addEventListener('click', () => {
+                window.location.href = 'admin.html';
+            });
+        } else {
+            document.getElementById('admin-btn').style.display = 'none';
+        }
+        
+        // Раскрываем приложение на весь экран
+        tg.expand();
+    </script>
 </body>
 </html>
