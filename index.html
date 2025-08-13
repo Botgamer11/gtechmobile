@@ -1,17 +1,47 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gtech Mobile</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Контент будет загружаться динамически -->
+    <div class="container">
+        <header>
+            <h1>GTECH MOBILE</h1>
+            <div class="balance">
+                <span>БАЛАНС: <span id="balance">0</span></span>
+                <span>БИЛЕТОВ: <span id="tickets">0</span></span>
+            </div>
+        </header>
+
+        <div class="buttons">
+            <button class="btn-gradient" onclick="openSection('bonus')">БОНУСНЫЕ МОНЕТЫ</button>
+            <button class="btn-gradient" onclick="openSection('shop')">МАГАЗИН</button>
+            <button class="btn-gradient" onclick="openSection('auction')">АУКЦИОН</button>
+            <button class="btn-gradient" onclick="openSection('withdraw')">ВЫВОД</button>
+            <button class="btn-gradient" onclick="openSection('storage')">ХРАНИЛИЩЕ</button>
+            <button class="btn-gradient" onclick="activatePromo()">ПРОМОКОД</button>
+            <button class="btn-gradient" onclick="openLink('https://vk.com/gtech')">ГРУППА ВК</button>
+            <button class="btn-gradient" onclick="openLink('https://gtech.com/download')">СКАЧАТЬ ИГРУ</button>
+        </div>
+
+        <!-- Секция бонусов -->
+        <div id="bonus" class="section hidden">
+            <h2>ЕЖЕДНЕВНЫЙ БОНУС</h2>
+            <p>Заберите +15 монет каждый день!</p>
+            <button class="btn-gradient" onclick="claimDailyBonus()">ЗАБРАТЬ</button>
+        </div>
+
+        <!-- Секция вывода -->
+        <div id="withdraw" class="section hidden">
+            <h2>ВЫВОД МОНЕТ</h2>
+            <p>Минимум: 100 монет</p>
+            <input type="text" id="nickname" placeholder="Никнейм">
+            <input type="number" id="amount" placeholder="Сумма">
+            <button class="btn-gradient" onclick="requestWithdraw()">ПОДАТЬ ЗАЯВКУ</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

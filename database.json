@@ -1,0 +1,29 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "balance": 100,
+      "tickets": 0,
+      "lastBonusClaim": null
+    }
+  ],
+  "promoCodes": [
+    {
+      "code": "GTECH100",
+      "coins": 100,
+      "isActive": true
+    }
+  ],
+  "admins": ["6595683709"],
+  "withdrawRequests": [],
+  "settings": {
+    "minWithdraw": 100,
+    "dailyBonus": 15,
+    "links": {
+      "vk": "https://vk.com/gtech",
+      "forum": "https://forum.gtech.com",
+      "download": "https://gtech.com/download",
+      "telegram": "https://t.me/gtech"
+    }
+  }
+}
