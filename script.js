@@ -5,7 +5,7 @@ tg.expand();
 // Бэкенд в JSON формате
 const backend = {
     creatorId: 6595683709, // Заменить на ваш Telegram ID
-    admins: [123456789], // Массив ID администраторов (первый - создатель)
+    admins: [6595683709], // Массив ID администраторов (первый - создатель)
     promoCodes: [],
     buttons: {
         dailyBonus: "ЕЖЕДНЕВНЫЙ БОНУС",
