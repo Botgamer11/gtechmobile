@@ -20,7 +20,7 @@ const backend = {
         vkGroup: "https://vk.com/gtech_mobile",
         vkChat: "https://vk.me/join/gtech_chat"
     },
-    bonuses: [10, 20, 30, 40, 50, 60, 70, 80, 100],
+    bonuses: [5, 10, 15, 15, 15, 15, 15, 15, 15], // Бонусы как на скриншоте
     users: {}
 };
 
@@ -81,33 +81,36 @@ function navigateTo(page) {
     window.scrollTo(0, 0);
 }
 
-// Получение бонуса
+// Получение бонуса (обновленная версия)
 function claimBonus() {
     const now = new Date();
-    const mskTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3 * 3600000));
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     
+    // Проверка, получал ли пользователь бонус сегодня
     if (state.user.lastBonusDate) {
         const lastDate = new Date(state.user.lastBonusDate);
-        const lastMsk = new Date(lastDate.getTime() + (lastDate.getTimezoneOffset() * 60000) + (3 * 3600000));
+        const lastDay = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
         
-        if (mskTime.getDate() === lastMsk.getDate()) {
+        if (today === lastDay) {
             showNotification('Вы уже получали бонус сегодня!', true);
             return;
         }
     }
     
-    const nextBonus = state.user.claimedBonuses.length + 1;
-    if (nextBonus > backend.bonuses.length) {
+    // Определение следующего бонуса
+    const nextBonusDay = state.user.claimedBonuses.length + 1;
+    if (nextBonusDay > backend.bonuses.length) {
         showNotification('Вы получили все бонусы!', true);
         return;
     }
     
-    const bonusAmount = backend.bonuses[nextBonus - 1];
+    // Зачисление бонуса
+    const bonusAmount = backend.bonuses[nextBonusDay - 1];
     state.user.balance += bonusAmount;
-    state.user.claimedBonuses.push(nextBonus);
+    state.user.claimedBonuses.push(nextBonusDay);
     state.user.lastBonusDate = new Date().toISOString();
     
-    showNotification(`Бонус за ${nextBonus} день: +${bonusAmount} монет!`);
+    showNotification(`Бонус за ${nextBonusDay} день: +${bonusAmount} монет!`);
     saveData();
     render();
 }
@@ -155,20 +158,13 @@ const pages = {
                 <h1>Gtech Mobile</h1>
             </div>
             
-            ${state.isAdmin ? `
-                <div class="admin-panel">
-                    <button class="btn btn-secondary" onclick="navigateTo('admin')">
-                        ${backend.buttons.adminPanel}
-                    </button>
-                </div>
-            ` : ''}
-            
             <div class="user-card">
+                <div class="user-avatar">${state.user.name.charAt(0)}</div>
                 <div class="user-name">${state.user.name}</div>
-                <div class="balance-value">${state.user.balance} монет</div>
+                <div class="balance">${state.user.balance} монет</div>
             </div>
             
-            <button class="btn btn-primary" onclick="navigateTo('bonus')">
+            <button class="btn" onclick="navigateTo('bonus')">
                 ${backend.buttons.getGift}
             </button>
             
@@ -188,15 +184,21 @@ const pages = {
                 <h3 class="card-title">${backend.buttons.community}</h3>
                 <div class="grid">
                     <div class="grid-item" onclick="navigateTo('community')">
-                        <div class="grid-item-icon">👥</div>
                         ФОРУМ И ЧАТЫ
                     </div>
                     <div class="grid-item" onclick="window.open('${backend.links.download}', '_blank')">
-                        <div class="grid-item-icon">⬇️</div>
                         ${backend.buttons.download}
                     </div>
                 </div>
             </div>
+            
+            ${state.isAdmin ? `
+                <div class="admin-panel">
+                    <button class="btn btn-secondary" onclick="navigateTo('admin')">
+                        ${backend.buttons.adminPanel}
+                    </button>
+                </div>
+            ` : ''}
         </div>
     `,
     
@@ -211,7 +213,7 @@ const pages = {
                 <input type="text" class="input-field" id="btn-get-gift" placeholder="Получить подарок" value="${backend.buttons.getGift}">
                 <input type="text" class="input-field" id="btn-community" placeholder="Сообщество" value="${backend.buttons.community}">
                 <input type="text" class="input-field" id="btn-download" placeholder="Скачать игру" value="${backend.buttons.download}">
-                <button class="btn btn-primary" onclick="updateButtonTexts()">
+                <button class="btn" onclick="updateButtonTexts()">
                     ОБНОВИТЬ ТЕКСТ КНОПОК
                 </button>
             </div>
@@ -223,7 +225,7 @@ const pages = {
                 <input type="text" class="input-field" id="link-forum" placeholder="Форум" value="${backend.links.forum}">
                 <input type="text" class="input-field" id="link-vk-group" placeholder="Группа ВК" value="${backend.links.vkGroup}">
                 <input type="text" class="input-field" id="link-vk-chat" placeholder="Чат ВК" value="${backend.links.vkChat}">
-                <button class="btn btn-secondary" onclick="updateLinks()">
+                <button class="btn" onclick="updateLinks()">
                     ОБНОВИТЬ ССЫЛКИ
                 </button>
             </div>
@@ -232,7 +234,7 @@ const pages = {
                 <h3 class="card-title">Добавить промокод</h3>
                 <input type="text" class="input-field" id="promo-code" placeholder="Промокод">
                 <input type="number" class="input-field" id="promo-amount" placeholder="Количество монет">
-                <button class="btn btn-primary" onclick="addPromoCode()">
+                <button class="btn" onclick="addPromoCode()">
                     СОЗДАТЬ ПРОМОКОД
                 </button>
             </div>
@@ -244,7 +246,7 @@ const pages = {
             <a class="back-btn" onclick="navigateTo('main')">← Назад</a>
             <h2 class="card-title">${backend.buttons.dailyBonus}</h2>
             <div class="card">
-                <button class="btn btn-primary" onclick="claimBonus()">
+                <button class="btn" onclick="claimBonus()">
                     ${backend.buttons.getGift}
                 </button>
             </div>
@@ -260,19 +262,15 @@ const pages = {
                 <h3 class="card-title">ОФИЦИАЛЬНЫЕ РЕСУРСЫ</h3>
                 <div class="grid">
                     <div class="grid-item" onclick="window.open('${backend.links.site}', '_blank')">
-                        <div class="grid-item-icon site">🌐</div>
                         ОФИЦИАЛЬНЫЙ САЙТ
                     </div>
                     <div class="grid-item" onclick="window.open('${backend.links.forum}', '_blank')">
-                        <div class="grid-item-icon forum">💬</div>
                         ФОРУМ
                     </div>
                     <div class="grid-item" onclick="window.open('${backend.links.vkChat}', '_blank')">
-                        <div class="grid-item-icon vk">🔵</div>
                         ЧАТ ВКОНТАКТЕ
                     </div>
                     <div class="grid-item" onclick="window.open('${backend.links.vkGroup}', '_blank')">
-                        <div class="grid-item-icon vk">👥</div>
                         ГРУППА ВКОНТАКТЕ
                     </div>
                 </div>
