@@ -12,6 +12,12 @@
     --vk-color: #4C75A3;
 }
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
     background-size: 400% 400%;
@@ -19,7 +25,7 @@ body {
     color: var(--text-light);
     min-height: 100vh;
     font-family: 'Roboto', sans-serif;
-    overflow-x: hidden;
+    padding: 20px;
 }
 
 @keyframes gradientBG {
@@ -30,250 +36,147 @@ body {
 
 .container {
     max-width: 100%;
-    padding: 16px;
     margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
 .header h1 {
     color: var(--primary-light);
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
-    text-align: center;
-    margin-bottom: 20px;
     text-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
 }
 
 .user-card {
     background: rgba(30, 30, 30, 0.8);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
 }
 
 .user-name {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
-    color: var(--text-light);
-    margin-bottom: 8px;
+    margin-bottom: 15px;
 }
 
 .balance-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 8px;
 }
 
 .balance-value {
-    font-size: 28px;
+    font-size: 36px;
     font-weight: 700;
     color: var(--primary-light);
+    margin-bottom: 5px;
 }
 
 .balance-label {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-gray);
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .buttons-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .btn {
     display: block;
     width: 100%;
-    padding: 14px;
+    padding: 16px;
     border-radius: 12px;
     border: none;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    background: linear-gradient(45deg, var(--primary), var(--primary-dark));
-    background-size: 200% 200%;
-    animation: gradientButton 3s ease infinite;
+    transition: all 0.3s ease;
     color: white;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
 }
 
-@keyframes gradientButton {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
 }
 
 .btn-secondary {
     background: linear-gradient(45deg, var(--secondary), #FFA000);
-    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
 }
 
 .btn-vk {
     background: linear-gradient(45deg, var(--vk-color), #3B5998);
-    box-shadow: 0 4px 8px rgba(76, 117, 163, 0.3);
+    box-shadow: 0 4px 10px rgba(76, 117, 163, 0.3);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .card {
     background: rgba(30, 30, 30, 0.8);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .card-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: var(--primary-light);
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin: 16px 0;
-}
-
-.grid-item {
-    background: rgba(56, 142, 60, 0.2);
-    border-radius: 12px;
-    padding: 12px;
     text-align: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-}
-
-.grid-item:hover {
-    background: rgba(76, 175, 80, 0.3);
-    transform: translateY(-2px);
-}
-
-.grid-item-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
-    color: var(--primary-light);
-}
-
-.grid-item-icon.vk {
-    color: var(--vk-color);
-}
-
-.grid-item-icon.site {
-    color: var(--primary);
-}
-
-.grid-item-icon.forum {
-    color: var(--secondary);
-}
-
-.back-btn {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    background: linear-gradient(45deg, var(--secondary), #FFA000);
-    background-size: 200% 200%;
-    animation: gradientButton 3s ease infinite;
-    color: white;
-    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
-    margin-bottom: 16px;
 }
 
 .bonus-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 16px 0;
+    gap: 12px;
+    margin-top: 15px;
 }
 
 .bonus-day {
-    background: rgba(30, 30, 30, 0.8);
-    border-radius: 12px;
-    padding: 12px 8px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 10px;
+    padding: 12px;
     text-align: center;
     border: 1px solid var(--primary);
-    transition: all 0.3s ease;
 }
 
 .bonus-day.active {
-    background: rgba(255, 193, 7, 0.1);
+    background: rgba(255, 193, 7, 0.15);
     border-color: var(--secondary);
-    animation: pulseGlow 0.5s ease;
-}
-
-@keyframes pulseGlow {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
 }
 
 .bonus-day-value {
     font-weight: 700;
     color: var(--secondary);
-    margin-top: 4px;
-}
-
-.input-field {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--primary);
-    background: rgba(30, 30, 30, 0.8);
-    color: var(--text-light);
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-}
-
-.input-field:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    margin-top: 5px;
 }
 
 .footer {
     text-align: center;
-    margin-top: 24px;
-    color: var(--text-gray);
-    font-size: 14px;
+    margin-top: 30px;
+    padding: 15px;
 }
 
-.admin-panel {
-    background: rgba(244, 67, 54, 0.1);
-    border: 1px solid var(--danger);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-}
-
-.admin-title {
-    color: var(--danger);
-    font-size: 18px;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 12px;
-}
-
-.admin-btn {
-    background: var(--danger);
-    color: white;
+.footer img {
+    max-width: 120px;
+    opacity: 0.8;
 }
 
 .notification {
@@ -285,7 +188,7 @@ body {
     color: white;
     padding: 12px 24px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards;
 }
@@ -299,61 +202,17 @@ body {
     to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
 }
 
-.page {
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.top-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.top-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: rgba(30, 30, 30, 0.5);
-    border-radius: 8px;
-}
-
-.top-item.current-user {
-    background: rgba(76, 175, 80, 0.2);
-    border: 1px solid var(--primary);
-}
-
-.top-position {
-    font-weight: bold;
-    color: var(--secondary);
-    width: 24px;
-}
-
-.top-name {
-    flex-grow: 1;
-    text-align: left;
-    padding: 0 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.top-balance {
-    font-weight: bold;
-    color: var(--primary-light);
-}
-
 @media (max-width: 480px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-    
     .bonus-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .user-card {
+        padding: 20px 15px;
+    }
+    
+    .btn {
+        padding: 14px;
+        font-size: 16px;
     }
 }
