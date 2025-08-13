@@ -4,7 +4,7 @@ tg.expand();
 
 // Бэкенд в JSON формате
 const backend = {
-    creatorId: 123456789, // Ваш Telegram ID
+    creatorId: 6595683709, // Ваш Telegram ID
     promoCodes: [],
     buttons: {
         dailyBonus: "ЕЖЕДНЕВНЫЙ БОНУС",
