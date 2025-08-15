@@ -216,3 +216,48 @@ body {
         font-size: 16px;
     }
 }
+/* Добавим в конец файла */
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+.top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.top-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(30, 30, 30, 0.7);
+    border-radius: 8px;
+}
+
+.current-user {
+    background: rgba(76, 175, 80, 0.2);
+    border-left: 3px solid var(--primary);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, var(--danger), #D32F2F);
+    box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+    margin-top: 10px;
+}
+
+.admin-panel {
+    margin-bottom: 20px;
+}
+
+.card + .card {
+    margin-top: 20px;
+}

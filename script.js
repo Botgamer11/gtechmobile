@@ -18,9 +18,14 @@ const backend = {
         topUsers: "ТОП ИГРОКОВ",
         enterPromo: "АКТИВИРОВАТЬ ПРОМОКОД"
     },
+    links: {
+        community: "https://t.me/yourcommunity",
+        download: "https://yourgame.com/download"
+    },
     bonuses: [10, 20, 30, 40, 50, 60, 70, 80, 100],
     users: {},
-    promoCodes: []
+    promoCodes: [],
+    admins: [6595683709] // Массив ID администраторов
 };
 
 // Состояние приложения
@@ -33,11 +38,29 @@ const state = {
         claimedBonuses: []
     },
     currentPage: 'main',
-    isAdmin: tg.initDataUnsafe?.user?.id === backend.creatorId
+    isAdmin: backend.admins.includes(tg.initDataUnsafe?.user?.id)
 };
 
+// Подключение к MySQL (это пример, в реальности нужно серверное API)
+async function queryDatabase(sql, params = []) {
+    try {
+        const response = await fetch('https://your-backend-api.com/db', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sql, params })
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Database error:', error);
+        return { error: 'Database connection failed' };
+    }
+}
+
 // Загрузка данных
-function loadData() {
+async function loadData() {
+    // Попробуем загрузить из локального хранилища
     const savedData = localStorage.getItem('gtech_data');
     if (savedData) {
         try {
@@ -46,6 +69,16 @@ function loadData() {
         } catch (e) {
             console.error('Ошибка загрузки данных:', e);
         }
+    }
+
+    // Загрузка из базы данных (пример)
+    try {
+        const dbData = await queryDatabase('SELECT * FROM app_settings WHERE id = 1');
+        if (dbData && !dbData.error) {
+            Object.assign(backend, dbData);
+        }
+    } catch (e) {
+        console.error('Ошибка загрузки из БД:', e);
     }
 
     if (!backend.users[state.user.id]) {
@@ -57,17 +90,25 @@ function loadData() {
     }
 
     Object.assign(state.user, backend.users[state.user.id]);
-    state.isAdmin = tg.initDataUnsafe?.user?.id === backend.creatorId;
+    state.isAdmin = backend.admins.includes(tg.initDataUnsafe?.user?.id);
 }
 
 // Сохранение данных
-function saveData() {
+async function saveData() {
     backend.users[state.user.id] = {
         balance: state.user.balance,
         lastBonusDate: state.user.lastBonusDate,
         claimedBonuses: state.user.claimedBonuses
     };
+    
     localStorage.setItem('gtech_data', JSON.stringify(backend));
+    
+    // Сохранение в базу данных (пример)
+    try {
+        await queryDatabase('UPDATE app_settings SET ? WHERE id = 1', [backend]);
+    } catch (e) {
+        console.error('Ошибка сохранения в БД:', e);
+    }
 }
 
 // Уведомления
@@ -87,7 +128,7 @@ function navigateTo(page) {
 }
 
 // Система бонусов
-function claimBonus() {
+async function claimBonus() {
     const today = new Date().toDateString();
     if (state.user.lastBonusDate === today) {
         showNotification('Вы уже получали бонус сегодня!', true);
@@ -106,12 +147,12 @@ function claimBonus() {
     state.user.lastBonusDate = today;
 
     showNotification(`Бонус за ${nextDay} день: +${bonus} монет!`);
-    saveData();
+    await saveData();
     render();
 }
 
 // Промокоды
-function activatePromo() {
+async function activatePromo() {
     const codeInput = document.getElementById('promo-code-input');
     if (!codeInput) return;
 
@@ -130,8 +171,100 @@ function activatePromo() {
     state.user.balance += promo.amount;
     showNotification(`Промокод активирован! +${promo.amount} монет`);
     codeInput.value = '';
-    saveData();
+    await saveData();
     render();
+}
+
+// Админ-функции
+async function addPromoCode() {
+    const code = document.getElementById('new-promo-code').value.trim();
+    const amount = parseInt(document.getElementById('new-promo-amount').value);
+    
+    if (!code || isNaN(amount)) {
+        showNotification('Заполните все поля!', true);
+        return;
+    }
+    
+    backend.promoCodes.push({ code, amount });
+    await saveData();
+    showNotification(`Промокод "${code}" создан!`);
+    document.getElementById('new-promo-code').value = '';
+    document.getElementById('new-promo-amount').value = '';
+}
+
+async function updateButtonText() {
+    const buttonId = document.getElementById('button-select').value;
+    const newText = document.getElementById('button-text-input').value.trim();
+    
+    if (!newText) {
+        showNotification('Введите текст!', true);
+        return;
+    }
+    
+    backend.buttons[buttonId] = newText;
+    await saveData();
+    showNotification('Текст кнопки обновлен!');
+    render();
+}
+
+async function updateLink() {
+    const linkId = document.getElementById('link-select').value;
+    const newLink = document.getElementById('link-input').value.trim();
+    
+    if (!newLink) {
+        showNotification('Введите ссылку!', true);
+        return;
+    }
+    
+    backend.links[linkId] = newLink;
+    await saveData();
+    showNotification('Ссылка обновлена!');
+}
+
+async function addAdmin() {
+    const adminId = parseInt(document.getElementById('new-admin-id').value);
+    
+    if (isNaN(adminId)) {
+        showNotification('Введите корректный ID!', true);
+        return;
+    }
+    
+    if (backend.admins.includes(adminId)) {
+        showNotification('Этот пользователь уже администратор!', true);
+        return;
+    }
+    
+    backend.admins.push(adminId);
+    await saveData();
+    showNotification('Администратор добавлен!');
+    document.getElementById('new-admin-id').value = '';
+    state.isAdmin = backend.admins.includes(tg.initDataUnsafe?.user?.id);
+}
+
+async function removeAdmin() {
+    const adminId = parseInt(document.getElementById('remove-admin-id').value);
+    
+    if (isNaN(adminId)) {
+        showNotification('Введите корректный ID!', true);
+        return;
+    }
+    
+    if (adminId === backend.creatorId) {
+        showNotification('Нельзя удалить создателя!', true);
+        return;
+    }
+    
+    const index = backend.admins.indexOf(adminId);
+    if (index === -1) {
+        showNotification('Пользователь не является администратором!', true);
+        return;
+    }
+    
+    backend.admins.splice(index, 1);
+    await saveData();
+    showNotification('Администратор удален!');
+    document.getElementById('remove-admin-id').value = '';
+    state.isAdmin = backend.admins.includes(tg.initDataUnsafe?.user?.id);
 }
 
 // Шаблоны страниц
@@ -170,6 +303,14 @@ const pages = {
                 <button class="btn btn-vk" onclick="navigateTo('top')">
                     ${backend.buttons.topUsers}
                 </button>
+                
+                <a href="${backend.links.community}" class="btn btn-secondary" target="_blank">
+                    ${backend.buttons.community}
+                </a>
+                
+                <a href="${backend.links.download}" class="btn btn-primary" target="_blank">
+                    ${backend.buttons.download}
+                </a>
             </div>
             
             <div class="card">
@@ -219,7 +360,7 @@ const pages = {
                 <div class="top-list">
                     ${Object.entries(backend.users)
                         .sort((a, b) => b[1].balance - a[1].balance)
-                        .slice(0, 10)
+                        .slice(0, 50) // Показываем топ-50 игроков
                         .map(([id, user], index) => `
                             <div class="top-item ${id === state.user.id.toString() ? 'current-user' : ''}">
                                 <span class="top-pos">${index + 1}.</span>
@@ -238,6 +379,32 @@ const pages = {
             <h2 class="card-title">${backend.buttons.adminPanel}</h2>
             
             <div class="card">
+                <h3 class="card-title">Управление кнопками</h3>
+                <select id="button-select" class="input-field">
+                    ${Object.keys(backend.buttons).map(key => `
+                        <option value="${key}">${key}</option>
+                    `).join('')}
+                </select>
+                <input type="text" id="button-text-input" class="input-field" placeholder="Новый текст">
+                <button class="btn btn-primary" onclick="updateButtonText()">
+                    ОБНОВИТЬ ТЕКСТ
+                </button>
+            </div>
+            
+            <div class="card">
+                <h3 class="card-title">Управление ссылками</h3>
+                <select id="link-select" class="input-field">
+                    ${Object.keys(backend.links).map(key => `
+                        <option value="${key}">${key}</option>
+                    `).join('')}
+                </select>
+                <input type="text" id="link-input" class="input-field" placeholder="Новая ссылка">
+                <button class="btn btn-primary" onclick="updateLink()">
+                    ОБНОВИТЬ ССЫЛКУ
+                </button>
+            </div>
+            
+            <div class="card">
                 <h3 class="card-title">Добавить промокод</h3>
                 <input type="text" id="new-promo-code" class="input-field" placeholder="Промокод">
                 <input type="number" id="new-promo-amount" class="input-field" placeholder="Количество монет">
@@ -245,26 +412,21 @@ const pages = {
                     СОЗДАТЬ ПРОМОКОД
                 </button>
             </div>
+            
+            <div class="card">
+                <h3 class="card-title">Управление администраторами</h3>
+                <input type="number" id="new-admin-id" class="input-field" placeholder="ID нового админа">
+                <button class="btn btn-primary" onclick="addAdmin()">
+                    ДОБАВИТЬ АДМИНА
+                </button>
+                <input type="number" id="remove-admin-id" class="input-field" placeholder="ID админа для удаления">
+                <button class="btn btn-danger" onclick="removeAdmin()">
+                    УДАЛИТЬ АДМИНА
+                </button>
+            </div>
         </div>
     `
 };
-
-// Админ-функции
-function addPromoCode() {
-    const code = document.getElementById('new-promo-code').value.trim();
-    const amount = parseInt(document.getElementById('new-promo-amount').value);
-    
-    if (!code || isNaN(amount)) {
-        showNotification('Заполните все поля!', true);
-        return;
-    }
-    
-    backend.promoCodes.push({ code, amount });
-    saveData();
-    showNotification(`Промокод "${code}" создан!`);
-    document.getElementById('new-promo-code').value = '';
-    document.getElementById('new-promo-amount').value = '';
-}
 
 // Рендер приложения
 function render() {
@@ -273,8 +435,8 @@ function render() {
 }
 
 // Инициализация
-function initApp() {
-    loadData();
+async function initApp() {
+    await loadData();
     render();
     tg.expand();
     tg.ready();
