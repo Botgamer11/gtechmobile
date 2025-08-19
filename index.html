@@ -733,6 +733,10 @@
                 <span class="action-icon">🏷️</span>
                 ВВЕСТИ ПРОМОКОД
             </button>
+            <button class="bottom-btn" onclick="openExchange()">
+                <span class="action-icon">🔄</span>
+                ОБМЕН РУБЛЕЙ НА БИЛЕТЫ
+            </button>
         </div>
     </div>
 
@@ -1079,24 +1083,42 @@ if (tg) {
         }
 
         function manageSpecificUser(user) {
-            const action = prompt(`Управление пользователем ${user.name}:\n\n1 - Добавить баланс\n2 - Списать баланс\n3 - Добавить билеты\n4 - Заблокировать\n5 - Удалить\n\nВведите номер действия:`);
+            const action = prompt(`Управление пользователем ${user.name}:
+
+1 - Добавить рубли
+2 - Списать рубли
+3 - Добавить билеты
+4 - Заблокировать
+5 - Удалить
+
+Введите номер действия:`);
             
             switch(action) {
                 case '1':
-                    const addBalance = parseInt(prompt('Сколько монет добавить:'));
+                    const addBalance = parseInt(prompt('Сколько рублей добавить:'));
                     if (addBalance > 0) {
                         user.balance = (user.balance || 0) + addBalance;
+                        if (appData.user.id && user.id === appData.user.id) {
+                            appData.user.balance = user.balance;
+                            updateUI();
+                        }
                         saveData();
-                        alert(`✅ Добавлено ${addBalance} монет пользователю ${user.name}`);
+                        updateAdminStats();
+                        showNotification(`✅ Добавлено ${addBalance} ₽ пользователю ${user.name}`, 'success');
                     }
                     break;
                     
                 case '2':
-                    const subBalance = parseInt(prompt('Сколько монет списать:'));
+                    const subBalance = parseInt(prompt('Сколько рублей списать:'));
                     if (subBalance > 0) {
                         user.balance = Math.max(0, (user.balance || 0) - subBalance);
+                        if (appData.user.id && user.id === appData.user.id) {
+                            appData.user.balance = user.balance;
+                            updateUI();
+                        }
                         saveData();
-                        alert(`✅ Списано ${subBalance} монет у пользователя ${user.name}`);
+                        updateAdminStats();
+                        showNotification(`✅ Списано ${subBalance} ₽ у пользователя ${user.name}`, 'success');
                     }
                     break;
                     
@@ -1104,22 +1126,29 @@ if (tg) {
                     const addTickets = parseInt(prompt('Сколько билетов добавить:'));
                     if (addTickets > 0) {
                         user.tickets = (user.tickets || 0) + addTickets;
+                        if (appData.user.id && user.id === appData.user.id) {
+                            appData.user.tickets = user.tickets;
+                            updateUI();
+                        }
                         saveData();
-                        alert(`✅ Добавлено ${addTickets} билетов пользователю ${user.name}`);
+                        updateAdminStats();
+                        showNotification(`✅ Добавлено ${addTickets} билетов пользователю ${user.name}`, 'success');
                     }
                     break;
                     
                 case '4':
                     user.blocked = !user.blocked;
                     saveData();
-                    alert(`✅ Пользователь ${user.name} ${user.blocked ? 'заблокирован' : 'разблокирован'}`);
+                    updateAdminStats();
+                    showNotification(`✅ Пользователь ${user.name} ${user.blocked ? 'заблокирован' : 'разблокирован'}`, 'success');
                     break;
                     
                 case '5':
                     if (confirm(`Удалить пользователя ${user.name}?`)) {
                         appData.users = appData.users.filter(u => u.id !== user.id);
                         saveData();
-                        alert(`✅ Пользователь ${user.name} удален`);
+                        updateAdminStats();
+                        showNotification(`✅ Пользователь ${user.name} удален`, 'success');
                     }
                     break;
             }
@@ -1269,6 +1298,55 @@ if (tg) {
             
             alert(storageList);
         }
+
+        // Обмен рублей на билеты (10 ₽ -> 2 билета)
+        function openExchange() {
+            const rateText = '10 ₽ = 2 билета';
+            if (appData.user.balance < 10) {
+                showNotification('❌ Недостаточно рублей для обмена. Нужно минимум 10 ₽.', 'error');
+                return;
+            }
+
+            const input = prompt(`🔄 Обмен рублей на билеты
+
+Курс: ${rateText}
+
+Сколько рублей обменять? Введите сумму кратную 10:`, '10');
+            if (input === null) return;
+            const amount = parseInt(input);
+
+            if (!Number.isFinite(amount) || amount <= 0) {
+                showNotification('❌ Введите корректную сумму.', 'error');
+                return;
+            }
+            if (amount % 10 !== 0) {
+                showNotification('❌ Сумма должна быть кратна 10 ₽.', 'error');
+                return;
+            }
+            if (amount > appData.user.balance) {
+                showNotification('❌ Недостаточно рублей на балансе.', 'error');
+                return;
+            }
+
+            const ticketsToAdd = (amount / 10) * 2;
+            appData.user.balance -= amount;
+            appData.user.tickets += ticketsToAdd;
+
+            if (appData.user.id) {
+                const current = appData.users.find(u => u.id === appData.user.id);
+                if (current) {
+                    current.balance = appData.user.balance;
+                    current.tickets = appData.user.tickets;
+                    current.lastActive = new Date().toISOString();
+                }
+            }
+
+            saveData();
+            updateUI();
+            showNotification(`✅ Обмен выполнен!
+−${amount} ₽  →  +${ticketsToAdd} билетов`, 'success');
+        }
+
 
         // Генерация календаря бонусов
         function generateBonusCalendar() {
