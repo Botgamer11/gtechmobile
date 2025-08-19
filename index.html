@@ -184,10 +184,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .grid-item:last-child {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
         .grid-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(0,0,0,0.3);
@@ -372,14 +368,8 @@
             font-size: 12px;
         }
 
-        .player-info {
-            flex: 1;
-        }
-
-        .player-name {
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
+        .player-info { flex: 1; }
+        .player-name { font-weight: bold; margin-bottom: 2px; }
 
         .player-score {
             display: flex;
@@ -387,93 +377,6 @@
             gap: 5px;
             color: #f39c12;
             font-size: 14px;
-        }
-
-        /* Промокод форма */
-        .promo-form {
-            margin-bottom: 20px;
-        }
-
-        .promo-input {
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .promo-input::placeholder {
-            color: #666;
-        }
-
-        .promo-submit {
-            width: 100%;
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            border: none;
-            border-radius: 15px;
-            padding: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* Магазин категории */
-        .shop-categories {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .shop-category {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .shop-category:nth-child(1) {
-            background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%);
-        }
-
-        .shop-category:nth-child(2) {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        }
-
-        .shop-category:nth-child(3) {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        }
-
-        .shop-category:nth-child(4) {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-        }
-
-        .shop-category:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-        }
-
-        .shop-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .shop-title {
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            line-height: 1.3;
         }
 
         /* Админ панель */
@@ -485,16 +388,9 @@
             display: none;
         }
 
-        .admin-panel.show {
-            display: block;
-        }
+        .admin-panel.show { display: block; }
 
-        .admin-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .admin-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
 
         .admin-stats {
             display: grid;
@@ -510,160 +406,31 @@
             text-align: center;
         }
 
-        .admin-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+        .admin-stat-value { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .admin-stat-label { font-size: 12px; opacity: 0.8; }
 
-        .admin-stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
+        .admin-actions { display: flex; flex-direction: column; gap: 10px; }
+        .admin-btn { background: rgba(255,255,255,0.2); border: none; border-radius: 15px; padding: 12px; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .admin-btn:hover { background: rgba(255,255,255,0.3); }
 
-        .admin-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .admin-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 15px;
-            padding: 12px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .admin-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Админ интерфейс в хедере */
-        .admin-indicator {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        /* Детальная статистика */
-        .detailed-stats {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-
-        /* Управление пользователями */
-        .user-management {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .user-item {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .user-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 8px;
-            padding: 5px 10px;
-            color: white;
-            font-size: 12px;
-            cursor: pointer;
-        }
+        .admin-indicator { background: linear-gradient(45deg, #e74c3c, #c0392b); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
 
         /* Download buttons */
-        .download-section {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .download-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 20px;
-            padding: 18px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .telegram-btn {
-            background: linear-gradient(45deg, #0088cc, #0066cc);
-        }
-
-        .appgallery-btn {
-            background: linear-gradient(45deg, #c6426e, #e74c3c);
-        }
-
-        .rustore-btn {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-        }
+        .download-section { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .download-btn { background: rgba(255,255,255,0.1); border: none; border-radius: 20px; padding: 18px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; }
+        .download-btn:hover { background: rgba(255,255,255,0.2); }
+        .telegram-btn { background: linear-gradient(45deg, #0088cc, #0066cc); }
+        .appgallery-btn { background: linear-gradient(45deg, #4c75a3, #2b5876); }
+        .rustore-btn { background: linear-gradient(45deg, #5865F2, #404EED); }
 
         /* Responsive */
         @media (max-width: 400px) {
-            .grid-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .bonus-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .shop-categories {
-                grid-template-columns: 1fr;
-            }
+            .grid-section { grid-template-columns: 1fr; }
+            .bonus-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
-    <!-- Основной экран -->
     <div id="mainScreen">
         <header class="header">
             <div class="logo-section">
@@ -682,8 +449,7 @@
         </header>
 
         <div class="user-info">
-            <div class="user-name" id="userName">ВАНЯ ФИЛАТОВ</div>
-            
+            <div class="user-name" id="userName">ГОСТЬ</div>
             <div class="balance-section">
                 <div class="balance-item">
                     <span>ВАШ БАЛАНС:</span>
@@ -728,33 +494,30 @@
         </div>
     </div>
 
-   <!-- Админ панель -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-title">👑 АДМИН ПАНЕЛЬ</div>
-        
-        <div class="detailed-stats">
-            <div class="stat-row">
-                <span>Всего пользователей:</span>
-                <span id="adminUserCount">0</span>
+        <div class="admin-stats">
+            <div class="admin-stat">
+                <div class="admin-stat-value" id="adminUserCount">0</div>
+                <div class="admin-stat-label">Всего пользователей</div>
             </div>
-            <div class="stat-row">
-                <span>Активных сегодня:</span>
-                <span id="adminActiveToday">0</span>
+            <div class="admin-stat">
+                <div class="admin-stat-value" id="adminActiveToday">0</div>
+                <div class="admin-stat-label">Активных сегодня</div>
             </div>
-            <div class="stat-row">
-                <span>Общий баланс:</span>
-                <span id="adminTotalBalance">0</span>
+            <div class="admin-stat">
+                <div class="admin-stat-value" id="adminTotalBalance">0</div>
+                <div class="admin-stat-label">Общий баланс</div>
             </div>
-            <div class="stat-row">
-                <span>Использовано промокодов:</span>
-                <span id="adminPromosUsed">0</span>
+            <div class="admin-stat">
+                <div class="admin-stat-value" id="adminPromosUsed">0</div>
+                <div class="admin-stat-label">Использовано промокодов</div>
             </div>
-            <div class="stat-row">
-                <span>Доступно промокодов:</span>
-                <span id="adminPromoCount">0</span>
+            <div class="admin-stat">
+                <div class="admin-stat-value" id="adminPromoCount">0</div>
+                <div class="admin-stat-label">Доступно промокодов</div>
             </div>
         </div>
-
         <div class="admin-actions">
             <button class="admin-btn" onclick="showCreatePromo()">📝 Создать промокод</button>
             <button class="admin-btn" onclick="showUserManagement()">👥 Управление пользователями</button>
@@ -767,7 +530,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно скачивания -->
     <div class="modal" id="downloadModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -781,20 +543,13 @@
                 СКАЧАЙ И УСТАНОВИ ЛАУНЧЕР, ДОЖДИСЬ ЗАГРУЗКИ ФАЙЛОВ И НАЧНИ ИГРАТЬ!
             </div>
             <div class="download-section">
-                <button class="download-btn telegram-btn" onclick="downloadTelegram()">
-                    📱 TELEGRAM
-                </button>
-                <button class="download-btn appgallery-btn" onclick="downloadAppGallery()">
-                    📱 VK
-                </button>
-                <button class="download-btn rustore-btn" onclick="downloadRuStore()">
-                    📱 Discord
-                </button>
+                <button class="download-btn telegram-btn" onclick="downloadTelegram()">📱 TELEGRAM</button>
+                <button class="download-btn appgallery-btn" onclick="downloadVk()">📱 VK</button>
+                <button class="download-btn rustore-btn" onclick="downloadDiscord()">📱 Discord</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно бонусов -->
     <div class="modal" id="bonusModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -802,18 +557,11 @@
                 <button class="close-btn" onclick="closeModal('bonusModal')">✕</button>
             </div>
             <div class="modal-subtitle">Заходите каждый день и забирайте бонусы.</div>
-            
-            <div class="timer-info" id="bonusTimer">
-                Можно забрать бонус через: 23ч. 59м. 48сек.
-            </div>
-            
-            <div class="bonus-grid" id="bonusGrid">
-                <!-- Дни будут генерироваться JavaScript -->
-            </div>
+            <div class="timer-info" id="bonusTimer">Можно забрать бонус через: 23ч. 59м. 48сек.</div>
+            <div class="bonus-grid" id="bonusGrid"></div>
         </div>
     </div>
 
-    <!-- Модальное окно промокода -->
     <div class="modal" id="promoModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -822,13 +570,12 @@
             </div>
             <div class="modal-subtitle">Введите ваш промокод</div>
             <div class="promo-form">
-                <input type="text" class="promo-input" id="promoInput" placeholder="Например, 1aA2-3bB4">
-                <button class="promo-submit" onclick="activatePromo()">ПРИМЕНИТЬ</button>
+                <input type="text" class="promo-input" id="promoInput" placeholder="Например, 1aA2-3bB4" style="width:100%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:15px;padding:15px;color:white;font-size:16px;margin-bottom:15px;">
+                <button class="promo-submit" onclick="activatePromo()" style="width:100%;background:linear-gradient(45deg,#2ecc71,#27ae60);border:none;border-radius:15px;padding:15px;color:white;font-size:16px;font-weight:bold;cursor:pointer;text-transform:uppercase;">ПРИМЕНИТЬ</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно лидерборда -->
     <div class="modal" id="leaderboardModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -836,32 +583,29 @@
                 <button class="close-btn" onclick="closeModal('leaderboardModal')">✕</button>
             </div>
             <div class="modal-subtitle">Все выводы товаров происходят каждый понедельник с 00:00 по 23:00</div>
-            
-            <div id="leaderboardList">
-                <!-- Лидерборд будет генерироваться JavaScript -->
-            </div>
+            <div id="leaderboardList"></div>
         </div>
     </div>
 
     <script>
         let appData = {
-    user: {
-        id: null,
-        name: 'ГОСТЬ', // Значение по умолчанию
-        balance: 0,
-        tickets: 0,
-        lastBonusDate: null,
-        bonusDays: 0,
-        usedPromos: [],
-        isAdmin: false,
-        username: null // Добавляем поле для username из Telegram
-    },
-    // ... остальные данные
+            user: {
+                id: null,
+                name: 'ГОСТЬ',
+                balance: 0,
+                tickets: 0,
+                lastBonusDate: null,
+                bonusDays: 0,
+                usedPromos: [],
+                isAdmin: false,
+                username: null
+            },
             settings: {
-                adminIds: [6595683709], // ID администраторов Telegram
+                adminIds: [6595683709],
                 downloadLinks: {
-                    Vk: 'https://t.me/gtechmobile',
-                    Telegram: 'https://appgallery.huawei.com'
+                    telegram: 'https://t.me/gtechmobile',
+                    vk: 'https://vk.com',
+                    discord: 'https://discord.com'
                 }
             },
             users: [],
@@ -869,103 +613,94 @@
                 { code: '1aA2-3bB4', reward: 100, uses: 0, maxUses: 10, created: new Date().toISOString() },
                 { code: 'BONUS2024', reward: 250, uses: 0, maxUses: 5, created: new Date().toISOString() }
             ],
-            leaderboard: [
-            ],
+            leaderboard: [],
             adminClicks: 0,
-            statistics: {
-                totalUsers: 0,
-                totalBalance: 0,
-                activeToday: 0,
-                promosUsed: 0
-            }
+            statistics: { totalUsers: 0, totalBalance: 0, activeToday: 0, promosUsed: 0 }
         };
 
-        // В начале скрипта, где инициализируется Telegram WebApp
-let tg = window.Telegram?.WebApp;
-if (tg) {
-    tg.ready();
-    tg.expand();
-    
-    // Получаем данные пользователя
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-        // Формируем имя из first_name и last_name (если есть)
-        let userName = user.first_name || '';
-        if (user.last_name) {
-            userName += ' ' + user.last_name;
+        function deepMerge(target, source) {
+            if (typeof target !== 'object' || target === null) return source;
+            if (typeof source !== 'object' || source === null) return target;
+            const result = Array.isArray(target) ? target.slice() : { ...target };
+            Object.keys(source).forEach((key) => {
+                const sVal = source[key];
+                const tVal = result[key];
+                if (Array.isArray(sVal)) {
+                    result[key] = sVal.slice();
+                } else if (typeof sVal === 'object' && sVal !== null) {
+                    result[key] = deepMerge(typeof tVal === 'object' && tVal !== null ? tVal : {}, sVal);
+                } else {
+                    result[key] = sVal;
+                }
+            });
+            return result;
         }
-        
-        // Сохраняем имя пользователя
-        appData.user.name = userName.trim().toUpperCase();
-        appData.user.id = user.id;
-        
-        // Обновляем отображение имени
-        document.getElementById('userName').textContent = appData.user.name;
-        
-        // Проверяем, является ли пользователь администратором
-        appData.user.isAdmin = appData.settings.adminIds.includes(user.id);
-        if (appData.user.isAdmin) {
-            showAdminInterface();
-        }
-    }
-}
 
-        // Загрузка данных из localStorage
+        function migrateSettings() {
+            if (!appData.settings) appData.settings = {};
+            if (!appData.settings.downloadLinks) appData.settings.downloadLinks = {};
+            const links = appData.settings.downloadLinks;
+            if (links.Vk && !links.vk) links.vk = links.Vk;
+            if (links.Telegram && !links.telegram) links.telegram = links.Telegram;
+            if (links.appgallery && !links.vk) links.vk = links.appgallery;
+            if (links.rustore && !links.discord) links.discord = links.rustore;
+            delete links.Vk; delete links.Telegram; delete links.appgallery; delete links.rustore;
+            if (!links.telegram) links.telegram = 'https://t.me/gtechmobile';
+            if (!links.vk) links.vk = 'https://vk.com';
+            if (!links.discord) links.discord = 'https://discord.com';
+        }
+
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                let rawName = (user.first_name || '').trim();
+                if (user.last_name) rawName += ' ' + user.last_name;
+                if (!rawName && user.username) rawName = '@' + user.username;
+                appData.user.name = rawName.trim().toUpperCase();
+                appData.user.id = user.id;
+                appData.user.username = user.username || null;
+                document.getElementById('userName').textContent = appData.user.name;
+                appData.user.isAdmin = appData.settings.adminIds.includes(user.id);
+                if (appData.user.isAdmin) document.getElementById('adminIndicator').style.display = 'block';
+            }
+        }
+
         function loadData() {
             const saved = localStorage.getItem('miniAppData');
             if (saved) {
-                const parsedData = JSON.parse(saved);
-                appData = { ...appData, ...parsedData };
-                updateUI();
+                const parsed = JSON.parse(saved);
+                appData = deepMerge(appData, parsed);
             }
+            migrateSettings();
+            updateUI();
             generateBonusCalendar();
             generateLeaderboard();
         }
 
-        // Сохранение данных в localStorage
-        function saveData() {
-            localStorage.setItem('miniAppData', JSON.stringify(appData));
-        }
+        function saveData() { localStorage.setItem('miniAppData', JSON.stringify(appData)); }
 
-        // Обновление UI
         function updateUI() {
             document.getElementById('balance').textContent = appData.user.balance;
             document.getElementById('tickets').textContent = appData.user.tickets;
             document.getElementById('userName').textContent = appData.user.name;
         }
 
-        // Показать админ интерфейс
-        function showAdminInterface() {
-            document.getElementById('adminIndicator').style.display = 'block';
-        }
-
-        // Переключение админ панели
         function toggleAdminPanel() {
             if (!appData.user.isAdmin) return;
-            
             const panel = document.getElementById('adminPanel');
             const isVisible = panel.classList.contains('show');
-            
-            if (isVisible) {
-                panel.classList.remove('show');
-                panel.style.display = 'none';
-            } else {
-                updateAdminStats();
-                panel.style.display = 'block';
-                panel.classList.add('show');
-            }
+            if (isVisible) { panel.classList.remove('show'); panel.style.display = 'none'; }
+            else { updateAdminStats(); panel.style.display = 'block'; panel.classList.add('show'); }
         }
 
-        // Обновление статистики админки
         function updateAdminStats() {
             const today = new Date().toDateString();
-            const activeToday = appData.users.filter(u => 
-                u.lastActive && new Date(u.lastActive).toDateString() === today
-            ).length;
-            
+            const activeToday = appData.users.filter(u => u.lastActive && new Date(u.lastActive).toDateString() === today).length;
             const totalBalance = appData.users.reduce((sum, u) => sum + (u.balance || 0), 0);
             const promosUsed = appData.promos.reduce((sum, p) => sum + p.uses, 0);
-            
             document.getElementById('adminUserCount').textContent = appData.users.length;
             document.getElementById('adminActiveToday').textContent = activeToday;
             document.getElementById('adminTotalBalance').textContent = totalBalance;
@@ -973,179 +708,82 @@ if (tg) {
             document.getElementById('adminPromoCount').textContent = appData.promos.length;
         }
 
-        // Создание промокода (админ)
         function showCreatePromo() {
             const promoCode = prompt('Введите код промокода (например, BONUS2024):');
             if (!promoCode) return;
-            
             const reward = parseInt(prompt('Введите награду (количество монет):'));
-            if (!reward || reward <= 0) {
-                alert('❌ Неверная награда!');
-                return;
-            }
-            
+            if (!reward || reward <= 0) { alert('❌ Неверная награда!'); return; }
             const maxUses = parseInt(prompt('Максимальное количество использований:'));
-            if (!maxUses || maxUses <= 0) {
-                alert('❌ Неверное количество использований!');
-                return;
-            }
-            
-            // Проверяем, не существует ли уже такой промокод
-            if (appData.promos.find(p => p.code === promoCode)) {
-                alert('❌ Промокод уже существует!');
-                return;
-            }
-            
-            appData.promos.push({
-                code: promoCode,
-                reward: reward,
-                uses: 0,
-                maxUses: maxUses,
-                created: new Date().toISOString(),
-                createdBy: appData.user.id
-            });
-            
-            saveData();
-            updateAdminStats();
-            
-            if (tg) {
-                tg.showAlert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
-            } else {
-                alert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
-            }
+            if (!maxUses || maxUses <= 0) { alert('❌ Неверное количество использований!'); return; }
+            if (appData.promos.find(p => p.code === promoCode)) { alert('❌ Промокод уже существует!'); return; }
+            appData.promos.push({ code: promoCode, reward, uses: 0, maxUses, created: new Date().toISOString(), createdBy: appData.user.id });
+            saveData(); updateAdminStats();
+            if (tg) tg.showAlert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
+            else alert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
         }
 
-        // Управление пользователями
         function showUserManagement() {
-            if (!appData.users.length) {
-                alert('👥 Пользователи не найдены');
-                return;
-            }
-            
+            if (!appData.users.length) { alert('👥 Пользователи не найдены'); return; }
             let usersList = 'Выберите пользователя для управления:\n\n';
             appData.users.forEach((user, index) => {
-                const lastActive = user.lastActive ? 
-                    new Date(user.lastActive).toLocaleDateString() : 'Никогда';
-                usersList += `${index + 1}. ${user.name}\n`;
-                usersList += `   ID: ${user.id}\n`;
-                usersList += `   Баланс: ${user.balance || 0}\n`;
-                usersList += `   Билеты: ${user.tickets || 0}\n`;
-                usersList += `   Последняя активность: ${lastActive}\n\n`;
+                const lastActive = user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Никогда';
+                usersList += `${index + 1}. ${user.name}\n   ID: ${user.id}\n   Баланс: ${user.balance || 0}\n   Билеты: ${user.tickets || 0}\n   Последняя активность: ${lastActive}\n\n`;
             });
-            
             const userIndex = parseInt(prompt(usersList + 'Введите номер пользователя:')) - 1;
-            
-            if (userIndex >= 0 && userIndex < appData.users.length) {
-                manageSpecificUser(appData.users[userIndex]);
-            }
+            if (userIndex >= 0 && userIndex < appData.users.length) manageSpecificUser(appData.users[userIndex]);
         }
 
         function manageSpecificUser(user) {
             const action = prompt(`Управление пользователем ${user.name}:\n\n1 - Добавить баланс\n2 - Списать баланс\n3 - Добавить билеты\n4 - Заблокировать\n5 - Удалить\n\nВведите номер действия:`);
-            
             switch(action) {
-                case '1':
+                case '1': {
                     const addBalance = parseInt(prompt('Сколько монет добавить:'));
-                    if (addBalance > 0) {
-                        user.balance = (user.balance || 0) + addBalance;
-                        saveData();
-                        alert(`✅ Добавлено ${addBalance} монет пользователю ${user.name}`);
-                    }
+                    if (addBalance > 0) { user.balance = (user.balance || 0) + addBalance; saveData(); alert(`✅ Добавлено ${addBalance} монет пользователю ${user.name}`); }
                     break;
-                    
-                case '2':
+                }
+                case '2': {
                     const subBalance = parseInt(prompt('Сколько монет списать:'));
-                    if (subBalance > 0) {
-                        user.balance = Math.max(0, (user.balance || 0) - subBalance);
-                        saveData();
-                        alert(`✅ Списано ${subBalance} монет у пользователя ${user.name}`);
-                    }
+                    if (subBalance > 0) { user.balance = Math.max(0, (user.balance || 0) - subBalance); saveData(); alert(`✅ Списано ${subBalance} монет у пользователя ${user.name}`); }
                     break;
-                    
-                case '3':
+                }
+                case '3': {
                     const addTickets = parseInt(prompt('Сколько билетов добавить:'));
-                    if (addTickets > 0) {
-                        user.tickets = (user.tickets || 0) + addTickets;
-                        saveData();
-                        alert(`✅ Добавлено ${addTickets} билетов пользователю ${user.name}`);
-                    }
+                    if (addTickets > 0) { user.tickets = (user.tickets || 0) + addTickets; saveData(); alert(`✅ Добавлено ${addTickets} билетов пользователю ${user.name}`); }
                     break;
-                    
-                case '4':
-                    user.blocked = !user.blocked;
-                    saveData();
-                    alert(`✅ Пользователь ${user.name} ${user.blocked ? 'заблокирован' : 'разблокирован'}`);
+                }
+                case '4': { user.blocked = !user.blocked; saveData(); alert(`✅ Пользователь ${user.name} ${user.blocked ? 'заблокирован' : 'разблокирован'}`); break; }
+                case '5': {
+                    if (confirm(`Удалить пользователя ${user.name}?`)) { appData.users = appData.users.filter(u => u.id !== user.id); saveData(); alert(`✅ Пользователь ${user.name} удален`); }
                     break;
-                    
-                case '5':
-                    if (confirm(`Удалить пользователя ${user.name}?`)) {
-                        appData.users = appData.users.filter(u => u.id !== user.id);
-                        saveData();
-                        alert(`✅ Пользователь ${user.name} удален`);
-                    }
-                    break;
-            }
-        }
-
-        // Управление промокодами
-        function showPromoManagement() {
-            if (!appData.promos.length) {
-                alert('🎫 Промокоды не найдены');
-                return;
-            }
-            
-            let promosList = 'Управление промокодами:\n\n';
-            appData.promos.forEach((promo, index) => {
-                promosList += `${index + 1}. ${promo.code}\n`;
-                promosList += `   Награда: ${promo.reward}\n`;
-                promosList += `   Использовано: ${promo.uses}/${promo.maxUses}\n`;
-                promosList += `   Создан: ${new Date(promo.created).toLocaleDateString()}\n\n`;
-            });
-            
-            const promoIndex = parseInt(prompt(promosList + 'Введите номер для удаления (или 0 для отмены):')) - 1;
-            
-            if (promoIndex >= 0 && promoIndex < appData.promos.length) {
-                if (confirm(`Удалить промокод "${appData.promos[promoIndex].code}"?`)) {
-                    appData.promos.splice(promoIndex, 1);
-                    saveData();
-                    alert('✅ Промокод удален');
                 }
             }
         }
 
-        // Управление ссылками
-        function showLinkManagement() {
-            const platform = prompt('Какую ссылку изменить?\n\n1 - Telegram\n2 - Vk\n3 - Discord\n\nВведите номер:');
-            
-            let currentLink = '';
-            let linkType = '';
-            
-            switch(platform) {
-                case '1':
-                    currentLink = appData.settings.downloadLinks.telegram;
-                    linkType = 'telegram';
-                    break;
-                case '2':
-                    currentLink = appData.settings.downloadLinks.appgallery;
-                    linkType = 'appgallery';
-                    break;
-                case '3':
-                    currentLink = appData.settings.downloadLinks.rustore;
-                    linkType = 'rustore';
-                    break;
-                default:
-                    return;
-            }
-            
-            const newLink = prompt(`Текущая ссылка:\n${currentLink}\n\nВведите новую ссылку:`);
-            if (newLink) {
-                appData.settings.downloadLinks[linkType] = newLink;
-                saveData();
-                alert('✅ Ссылка обновлена');
+        function showPromoManagement() {
+            if (!appData.promos.length) { alert('🎫 Промокоды не найдены'); return; }
+            let promosList = 'Управление промокодами:\n\n';
+            appData.promos.forEach((promo, index) => {
+                promosList += `${index + 1}. ${promo.code}\n   Награда: ${promo.reward}\n   Использовано: ${promo.uses}/${promo.maxUses}\n   Создан: ${new Date(promo.created).toLocaleDateString()}\n\n`;
+            });
+            const promoIndex = parseInt(prompt(promosList + 'Введите номер для удаления (или 0 для отмены):')) - 1;
+            if (promoIndex >= 0 && promoIndex < appData.promos.length) {
+                if (confirm(`Удалить промокод "${appData.promos[promoIndex].code}"?`)) { appData.promos.splice(promoIndex, 1); saveData(); alert('✅ Промокод удален'); }
             }
         }
 
-        // Экспорт данных
+        function showLinkManagement() {
+            const platform = prompt('Какую ссылку изменить?\n\n1 - Telegram\n2 - Vk\n3 - Discord\n\nВведите номер:');
+            let currentLink = ''; let linkType = '';
+            switch(platform) {
+                case '1': currentLink = appData.settings.downloadLinks.telegram; linkType = 'telegram'; break;
+                case '2': currentLink = appData.settings.downloadLinks.vk; linkType = 'vk'; break;
+                case '3': currentLink = appData.settings.downloadLinks.discord; linkType = 'discord'; break;
+                default: return;
+            }
+            const newLink = prompt(`Текущая ссылка:\n${currentLink}\n\nВведите новую ссылку:`);
+            if (newLink) { appData.settings.downloadLinks[linkType] = newLink; saveData(); alert('✅ Ссылка обновлена'); }
+        }
+
         function exportData() {
             const data = {
                 users: appData.users,
@@ -1153,185 +791,81 @@ if (tg) {
                 statistics: {
                     totalUsers: appData.users.length,
                     totalBalance: appData.users.reduce((sum, u) => sum + (u.balance || 0), 0),
-                    activeToday: appData.users.filter(u => 
-                        u.lastActive && new Date(u.lastActive).toDateString() === new Date().toDateString()
-                    ).length,
+                    activeToday: appData.users.filter(u => u.lastActive && new Date(u.lastActive).toDateString() === new Date().toDateString()).length,
                     exportDate: new Date().toISOString()
                 }
             };
-            
             const dataStr = JSON.stringify(data, null, 2);
-            
-            if (tg) {
-                // В реальном приложении можно отправить данные в бот
-                tg.sendData(dataStr);
-            } else {
-                // Для демонстрации показываем alert
-                alert('📊 Данные экспортированы в консоль браузера');
-                console.log('Экспорт данных:', data);
-            }
+            if (tg) tg.sendData(dataStr); else { alert('📊 Данные экспортированы в консоль браузера'); console.log('Экспорт данных:', data); }
         }
 
-        // Модальные окна
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openLeaderboard() { openModal('leaderboardModal'); generateLeaderboard(); }
+        function openShop() { const exists = document.getElementById('shopModal'); if (exists) openModal('shopModal'); }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function openDownloadModal() {
-            openModal('downloadModal');
-        }
-
-        function openBonusModal() {
-            openModal('bonusModal');
-            generateBonusCalendar();
-        }
-
-        function openPromoModal() {
-            openModal('promoModal');
-        }
-
-        function openLeaderboard() {
-            openModal('leaderboardModal');
-            generateLeaderboard();
-        }
-
-        function openShop() {
-            openModal('shopModal');
-        }
-
-        // Хранилище предметов
         function openStorage() {
-            if (!appData.user.inventory || appData.user.inventory.length === 0) {
-                alert('📦 Ваше хранилище пусто\n\nПокупайте товары в магазине!');
-                return;
-            }
-            
+            if (!appData.user.inventory || appData.user.inventory.length === 0) { alert('📦 Ваше хранилище пусто\n\nПокупайте товары в магазине!'); return; }
             let storageList = '📦 ХРАНИЛИЩЕ ПРЕДМЕТОВ\n\n';
-            
-            const statusText = {
-                pending: '⏳ Ожидает вывода',
-                processing: '🔄 В обработке',
-                delivered: '✅ Доставлено'
-            };
-            
+            const statusText = { pending: '⏳ Ожидает вывода', processing: '🔄 В обработке', delivered: '✅ Доставлено' };
             appData.user.inventory.forEach((item, index) => {
                 const purchaseDate = new Date(item.purchaseDate).toLocaleDateString();
-                storageList += `${index + 1}. ${item.item}\n`;
-                storageList += `   Категория: ${item.category}\n`;
-                storageList += `   Куплено: ${purchaseDate}\n`;
-                storageList += `   Статус: ${statusText[item.status] || '❓ Неизвестно'}\n\n`;
+                storageList += `${index + 1}. ${item.item}\n   Категория: ${item.category}\n   Куплено: ${purchaseDate}\n   Статус: ${statusText[item.status] || '❓ Неизвестно'}\n\n`;
             });
-            
-            storageList += 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\n';
-            storageList += 'Powered by Gtech Mobile';
-            
+            storageList += 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\nPowered by Gtech Mobile';
             alert(storageList);
         }
 
-        // Генерация календаря бонусов
         function generateBonusCalendar() {
             const bonusGrid = document.getElementById('bonusGrid');
             const rewards = [5, 10, 15, 15, 15, 15, 15, 15, 15];
-            const today = new Date().getDate();
-            
             bonusGrid.innerHTML = '';
-            
             for (let i = 1; i <= 9; i++) {
                 const dayElement = document.createElement('div');
                 dayElement.className = 'bonus-day';
-                
-                if (i <= appData.user.bonusDays) {
-                    dayElement.classList.add('claimed');
-                } else if (i === appData.user.bonusDays + 1 && canClaimBonus()) {
-                    dayElement.classList.add('active');
-                    dayElement.onclick = () => claimBonus(i);
-                }
-                
-                dayElement.innerHTML = `
-                    <div class="bonus-day-number">${i} ДЕНЬ</div>
-                    <div class="bonus-reward">
-                        <div class="coin-icon">₽</div>
-                        <span>${rewards[i-1]}</span>
-                    </div>
-                `;
-                
+                if (i <= appData.user.bonusDays) dayElement.classList.add('claimed');
+                else if (i === appData.user.bonusDays + 1 && canClaimBonus()) { dayElement.classList.add('active'); dayElement.onclick = () => claimBonus(i); }
+                dayElement.innerHTML = `<div class="bonus-day-number">${i} ДЕНЬ</div><div class="bonus-reward"><div class="coin-icon">₽</div><span>${rewards[i-1]}</span></div>`;
                 bonusGrid.appendChild(dayElement);
             }
-            
             updateBonusTimer();
         }
 
-        // Проверка возможности получения бонуса
         function canClaimBonus() {
             const now = new Date();
             const lastBonus = appData.user.lastBonusDate ? new Date(appData.user.lastBonusDate) : null;
-            
             if (!lastBonus) return true;
-            
-            const timeDiff = now.getTime() - lastBonus.getTime();
-            const hoursDiff = timeDiff / (1000 * 3600);
-            
+            const hoursDiff = (now.getTime() - lastBonus.getTime()) / (1000 * 3600);
             return hoursDiff >= 24;
         }
 
-        // Улучшенное получение бонуса
         function claimBonus(day) {
-            if (!canClaimBonus()) {
-                showNotification('❌ Бонус ещё не доступен!', 'error');
-                return;
-            }
-            
+            if (!canClaimBonus()) { showNotification('❌ Бонус ещё не доступен!', 'error'); return; }
             const rewards = [5, 10, 15, 15, 15, 15, 15, 15, 15];
             const reward = rewards[day - 1];
-            
             appData.user.balance += reward;
             appData.user.bonusDays = Math.max(appData.user.bonusDays, day);
             appData.user.lastBonusDate = new Date().toISOString();
-            
-            // Дополнительная награда за серию
             if (day === 7) {
-                appData.user.balance += 50; // Бонус за неделю
+                appData.user.balance += 50;
                 showNotification(`🎉 Недельный бонус!\nВы получили ${reward} + 50 (недельный бонус) = ${reward + 50} монет!`, 'success');
             } else if (day === 9) {
-                appData.user.tickets += 1; // Билет за полную серию
+                appData.user.tickets += 1;
                 showNotification(`🎊 Полная серия!\nВы получили ${reward} монет + 1 билет!`, 'success');
             } else {
                 showNotification(`🎉 Ежедневный бонус!\nВы получили ${reward} монет!`, 'success');
             }
-            
-            saveData();
-            updateUI();
-            generateBonusCalendar();
-            logUserActivity(`bonus_day_${day}`);
+            saveData(); updateUI(); generateBonusCalendar(); logUserActivity(`bonus_day_${day}`);
         }
 
-        // Улучшенная инициализация приложения
         window.addEventListener('load', () => {
             loadData();
-            
-            // Добавляем пользователя в базу если его нет
             if (appData.user.id) {
                 let user = appData.users.find(u => u.id === appData.user.id);
                 if (!user) {
-                    user = {
-                        id: appData.user.id,
-                        name: appData.user.name,
-                        balance: appData.user.balance,
-                        tickets: appData.user.tickets,
-                        joinDate: new Date().toISOString(),
-                        lastActive: new Date().toISOString(),
-                        bonusDays: appData.user.bonusDays,
-                        usedPromos: appData.user.usedPromos,
-                        inventory: appData.user.inventory || [],
-                        activities: []
-                    };
+                    user = { id: appData.user.id, name: appData.user.name, balance: appData.user.balance, tickets: appData.user.tickets, joinDate: new Date().toISOString(), lastActive: new Date().toISOString(), bonusDays: appData.user.bonusDays, usedPromos: appData.user.usedPromos, inventory: appData.user.inventory || [], activities: [] };
                     appData.users.push(user);
                 } else {
-                    // Обновляем данные существующего пользователя
                     user.name = appData.user.name;
                     user.lastActive = new Date().toISOString();
                     user.balance = appData.user.balance;
@@ -1339,127 +873,68 @@ if (tg) {
                 }
                 saveData();
             }
-
-            // Автоматическое обновление лидерборда
-            setInterval(() => {
-                if (document.getElementById('leaderboardModal').style.display === 'flex') {
-                    generateLeaderboard();
-                }
-            }, 30000); // Обновляем каждые 30 секунд
+            setInterval(() => { if (document.getElementById('leaderboardModal').style.display === 'flex') generateLeaderboard(); }, 30000);
         });
 
-        // Обновление таймера бонуса
         function updateBonusTimer() {
             const timerElement = document.getElementById('bonusTimer');
-            if (!appData.user.lastBonusDate) {
-                timerElement.textContent = 'Бонус доступен сейчас!';
-                return;
-            }
-            
+            if (!appData.user.lastBonusDate) { timerElement.textContent = 'Бонус доступен сейчас!'; return; }
             const lastBonus = new Date(appData.user.lastBonusDate);
             const nextBonus = new Date(lastBonus.getTime() + 24 * 60 * 60 * 1000);
             const now = new Date();
-            
-            if (now >= nextBonus) {
-                timerElement.textContent = 'Бонус доступен сейчас!';
-                return;
-            }
-            
+            if (now >= nextBonus) { timerElement.textContent = 'Бонус доступен сейчас!'; return; }
             const timeDiff = nextBonus.getTime() - now.getTime();
             const hours = Math.floor(timeDiff / (1000 * 60 * 60));
             const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-            
             timerElement.textContent = `Можно забрать бонус через: ${hours}ч. ${minutes}м. ${seconds}сек.`;
         }
 
-        // Генерация лидерборда в реальном времени
         function generateLeaderboard() {
             const leaderboardList = document.getElementById('leaderboardList');
             leaderboardList.innerHTML = '';
-            
-            // Создаем массив всех игроков (реальные пользователи + текущий пользователь)
-            let allPlayers = [...appData.leaderboard]; // Начальные фейковые игроки
-            
-            // Добавляем всех реальных пользователей
+            let allPlayers = [...appData.leaderboard];
             appData.users.forEach(user => {
                 if (user.balance > 0) {
-                    // Удаляем фейкового игрока если есть реальный с таким же именем
                     allPlayers = allPlayers.filter(p => p.name.toUpperCase() !== user.name.toUpperCase());
-                    
-                    allPlayers.push({
-                        name: user.name.toUpperCase(),
-                        score: user.balance,
-                        avatar: getUserAvatar(user.name),
-                        isReal: true,
-                        id: user.id,
-                        lastActive: user.lastActive
-                    });
+                    allPlayers.push({ name: user.name.toUpperCase(), score: user.balance, avatar: getUserAvatar(user.name), isReal: true, id: user.id, lastActive: user.lastActive });
                 }
             });
-            
-            // Сортируем по убыванию баланса
             allPlayers.sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
-                // При равном балансе сортируем по активности (реальные игроки выше)
                 if (a.isReal && !b.isReal) return -1;
                 if (!a.isReal && b.isReal) return 1;
                 return 0;
             });
-            
-            // Показываем топ-50 игроков
             const topPlayers = allPlayers.slice(0, 50);
-            
             topPlayers.forEach((player, index) => {
                 const playerElement = document.createElement('div');
                 playerElement.className = 'leaderboard-item';
-                
-                // Подсвечиваем текущего пользователя
-                if (player.id === appData.user.id) {
-                    playerElement.style.background = 'linear-gradient(45deg, rgba(241, 196, 15, 0.2), rgba(243, 156, 18, 0.2))';
-                    playerElement.style.border = '2px solid #f1c40f';
-                }
-                
-                // Особые стили для топ-3
+                if (player.id === appData.user.id) { playerElement.style.background = 'linear-gradient(45deg, rgba(241, 196, 15, 0.2), rgba(243, 156, 18, 0.2))'; playerElement.style.border = '2px solid #f1c40f'; }
                 let rankStyle = '';
-                if (index === 0) rankStyle = 'color: #f1c40f; font-size: 20px;'; // Золото
-                else if (index === 1) rankStyle = 'color: #95a5a6; font-size: 18px;'; // Серебро  
-                else if (index === 2) rankStyle = 'color: #e67e22; font-size: 16px;'; // Бронза
-                
+                if (index === 0) rankStyle = 'color: #f1c40f; font-size: 20px;';
+                else if (index === 1) rankStyle = 'color: #95a5a6; font-size: 18px;';
+                else if (index === 2) rankStyle = 'color: #e67e22; font-size: 16px;';
                 playerElement.innerHTML = `
                     <div class="rank" style="${rankStyle}">#${index + 1}</div>
                     <div class="player-avatar">${player.avatar}</div>
                     <div class="player-info">
-                        <div class="player-name">
-                            ${player.name}
-                            ${player.isReal ? '<span style="color: #2ecc71; font-size: 12px;">●</span>' : '<span style="color: #95a5a6; font-size: 12px;">○</span>'}
-                        </div>
-                        <div class="player-score">
-                            <div class="coin-icon">₽</div>
-                            <span>+${player.score}</span>
-                            ${player.lastActive ? `<span style="font-size: 10px; color: #95a5a6; margin-left: 5px;">${getTimeAgo(player.lastActive)}</span>` : ''}
-                        </div>
+                        <div class="player-name">${player.name} ${player.isReal ? '<span style="color:#2ecc71;font-size:12px;">●</span>' : '<span style="color:#95a5a6;font-size:12px;">○</span>'}</div>
+                        <div class="player-score"><div class="coin-icon">₽</div><span>+${player.score}</span>${player.lastActive ? `<span style="font-size:10px;color:#95a5a6;margin-left:5px;">${getTimeAgo(player.lastActive)}</span>` : ''}</div>
                     </div>
                 `;
-                
                 leaderboardList.appendChild(playerElement);
             });
-            
-            // Обновляем заголовок с количеством игроков
             const modalTitle = document.querySelector('#leaderboardModal .modal-title');
-            if (modalTitle) {
-                modalTitle.textContent = `ТОП АКТИВНЫХ ИГРОКОВ (${topPlayers.length})`;
-            }
+            if (modalTitle) modalTitle.textContent = `ТОП АКТИВНЫХ ИГРОКОВ (${topPlayers.length})`;
         }
 
-        // Получение аватара для пользователя
         function getUserAvatar(name) {
-            const avatars = ['🎮', '💎', '👔', '💀', '⚽', '🎯', '🚀', '⭐', '🔥', '💫', '🎪', '🎨', '🎭', '🎪', '🏆'];
+            const avatars = ['🎮', '💎', '👔', '💀', '⚽', '🎯', '🚀', '⭐', '🔥', '💫', '🎪', '🎨', '🎭', '🏆'];
             const nameHash = name.split('').reduce((hash, char) => hash + char.charCodeAt(0), 0);
             return avatars[nameHash % avatars.length];
         }
 
-        // Функция для показа времени "назад"
         function getTimeAgo(dateString) {
             const now = new Date();
             const date = new Date(dateString);
@@ -1467,7 +942,6 @@ if (tg) {
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMs / 3600000);
             const diffDays = Math.floor(diffMs / 86400000);
-            
             if (diffMins < 1) return 'сейчас';
             if (diffMins < 60) return `${diffMins}м`;
             if (diffHours < 24) return `${diffHours}ч`;
@@ -1475,13 +949,8 @@ if (tg) {
             return 'давно';
         }
 
-        // Обработка клика по логотипу (оставляем для обычных пользователей как пасхалку)
         function handleLogoClick() {
-            if (appData.user.isAdmin) {
-                toggleAdminPanel();
-                return;
-            }
-            
+            if (appData.user.isAdmin) { toggleAdminPanel(); return; }
             appData.adminClicks++;
             if (appData.adminClicks >= 7) {
                 alert('🎊 Поздравляем!\n\nВы нашли секретную пасхалку!\n\n+50 монет к балансу!');
@@ -1490,181 +959,72 @@ if (tg) {
                 saveData();
                 updateUI();
                 logUserActivity('easter_egg');
-            } else {
-                const remaining = 7 - appData.adminClicks;
-                if (remaining <= 3) {
-                    // Подсказка когда осталось мало кликов
-                    console.log(`Осталось кликов: ${remaining}`);
-                }
             }
         }
 
-        // Улучшенная система промокодов с уведомлениями
         function activatePromo() {
             const promoCode = document.getElementById('promoInput').value.trim().toUpperCase();
-            
-            if (!promoCode) {
-                showNotification('❌ Введите промокод!', 'error');
-                return;
-            }
-            
-            // Проверяем, не использовался ли промокод
-            if (appData.user.usedPromos.includes(promoCode)) {
-                showNotification('❌ Промокод уже использован!', 'error');
-                return;
-            }
-            
-            // Ищем промокод
+            if (!promoCode) { showNotification('❌ Введите промокод!', 'error'); return; }
+            if (appData.user.usedPromos.includes(promoCode)) { showNotification('❌ Промокод уже использован!', 'error'); return; }
             const promo = appData.promos.find(p => p.code.toUpperCase() === promoCode);
-            
-            if (!promo) {
-                showNotification('❌ Промокод не найден!', 'error');
-                return;
-            }
-            
-            // Проверяем лимит использований
-            if (promo.uses >= promo.maxUses) {
-                showNotification('❌ Промокод исчерпан!', 'error');
-                return;
-            }
-            
-            // Активируем промокод
+            if (!promo) { showNotification('❌ Промокод не найден!', 'error'); return; }
+            if (promo.uses >= promo.maxUses) { showNotification('❌ Промокод исчерпан!', 'error'); return; }
             appData.user.balance += promo.reward;
             appData.user.usedPromos.push(promoCode);
             promo.uses++;
-            
-            saveData();
-            updateUI();
-            closeModal('promoModal');
-            logUserActivity(`promo_${promoCode}`);
-            
+            saveData(); updateUI(); closeModal('promoModal'); logUserActivity(`promo_${promoCode}`);
             showNotification(`🎉 Промокод активирован!\nПолучено ${promo.reward} монет!`, 'success');
             document.getElementById('promoInput').value = '';
         }
 
-        // Система уведомлений
         function showNotification(message, type = 'info') {
             if (tg) {
-                if (type === 'error') {
-                    tg.showAlert(message);
-                } else {
-                    tg.showPopup({
-                        title: type === 'success' ? 'Успех!' : 'Уведомление',
-                        message: message,
-                        buttons: [{type: 'ok'}]
-                    });
-                }
-            } else {
-                alert(message);
-            }
+                if (type === 'error') tg.showAlert(message);
+                else tg.showPopup({ title: type === 'success' ? 'Успех!' : 'Уведомление', message, buttons: [{type: 'ok'}] });
+            } else { alert(message); }
         }
 
-        // Функции скачивания (теперь используют настроенные ссылки)
         function downloadTelegram() {
             const link = appData.settings.downloadLinks.telegram;
-            if (tg) {
-                tg.openLink(link);
-            } else {
-                window.open(link, '_blank');
-            }
-            
-            // Записываем статистику скачивания
+            if (tg) tg.openLink(link); else window.open(link, '_blank');
             logUserActivity('download_telegram');
         }
-
-        function downloadAppGallery() {
-            const link = appData.settings.downloadLinks.appgallery;
-            if (tg) {
-                tg.openLink(link);
-            } else {
-                window.open(link, '_blank');
-            }
-            
-            logUserActivity('download_appgallery');
+        function downloadVk() {
+            const link = appData.settings.downloadLinks.vk;
+            if (tg) tg.openLink(link); else window.open(link, '_blank');
+            logUserActivity('download_vk');
+        }
+        function downloadDiscord() {
+            const link = appData.settings.downloadLinks.discord;
+            if (tg) tg.openLink(link); else window.open(link, '_blank');
+            logUserActivity('download_discord');
         }
 
-        function downloadRuStore() {
-            const link = appData.settings.downloadLinks.rustore;
-            if (tg) {
-                tg.openLink(link);
-            } else {
-                window.open(link, '_blank');
-            }
-            
-            logUserActivity('download_rustore');
-        }
-
-        // Логирование активности пользователя
         function logUserActivity(action) {
             if (!appData.user.id) return;
-            
             const user = appData.users.find(u => u.id === appData.user.id);
             if (user) {
                 user.lastActive = new Date().toISOString();
                 if (!user.activities) user.activities = [];
-                user.activities.push({
-                    action: action,
-                    timestamp: new Date().toISOString()
-                });
-                
-                // Сохраняем только последние 50 активностей
-                if (user.activities.length > 50) {
-                    user.activities = user.activities.slice(-50);
-                }
-                
+                user.activities.push({ action, timestamp: new Date().toISOString() });
+                if (user.activities.length > 50) user.activities = user.activities.slice(-50);
                 saveData();
             }
         }
 
-        // Категории магазина
         function openCategory(category) {
-            const categoryNames = {
-                transport: 'УНИКАЛЬНЫЙ ТРАНСПОРТ',
-                skins: 'УНИКАЛЬНЫЕ СКИНЫ', 
-                items: 'УНИКАЛЬНЫЕ ПРЕДМЕТЫ',
-                currency: 'ВИРТУАЛЬНАЯ ВАЛЮТА'
-            };
-            
+            const categoryNames = { transport: 'УНИКАЛЬНЫЙ ТРАНСПОРТ', skins: 'УНИКАЛЬНЫЕ СКИНЫ', items: 'УНИКАЛЬНЫЕ ПРЕДМЕТЫ', currency: 'ВИРТУАЛЬНАЯ ВАЛЮТА' };
             alert(`🛍️ ${categoryNames[category]}\n\nВсе выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\nPowered by Gtech Mobile`);
         }
 
-        // Админ функция для сброса лидерборда
         function resetLeaderboard() {
-            if (!appData.user.isAdmin) {
-                showNotification('❌ Нет доступа!', 'error');
-                return;
-            }
-            
+            if (!appData.user.isAdmin) { showNotification('❌ Нет доступа!', 'error'); return; }
             const confirmation = confirm('🔄 СБРОС ЛИДЕРБОРДА\n\nВы уверены, что хотите:\n\n1. Обнулить баланс всех пользователей\n2. Сбросить бонусные дни\n3. Очистить инвентари\n4. Начать топ с нуля\n\nЭТО ДЕЙСТВИЕ НЕОБРАТИМО!');
-            
             if (!confirmation) return;
-            
             const doubleConfirm = prompt('Для подтверждения введите "RESET":');
-            if (doubleConfirm !== 'RESET') {
-                alert('❌ Сброс отменен');
-                return;
-            }
-            
-            // Сбрасываем всех пользователей
-            appData.users.forEach(user => {
-                user.balance = 0;
-                user.tickets = 0;
-                user.bonusDays = 0;
-                user.lastBonusDate = null;
-                user.usedPromos = [];
-                user.inventory = [];
-                user.activities = [];
-            });
-            
-            // Сбрасываем текущего пользователя
-            appData.user.balance = 0;
-            appData.user.tickets = 0;
-            appData.user.bonusDays = 0;
-            appData.user.lastBonusDate = null;
-            appData.user.usedPromos = [];
-            appData.user.inventory = [];
-            
-            // Возвращаем базовый лидерборд
+            if (doubleConfirm !== 'RESET') { alert('❌ Сброс отменен'); return; }
+            appData.users.forEach(user => { user.balance = 0; user.tickets = 0; user.bonusDays = 0; user.lastBonusDate = null; user.usedPromos = []; user.inventory = []; user.activities = []; });
+            appData.user.balance = 0; appData.user.tickets = 0; appData.user.bonusDays = 0; appData.user.lastBonusDate = null; appData.user.usedPromos = []; appData.user.inventory = [];
             appData.leaderboard = [
                 { name: 'ZUZULKO', score: 787, avatar: '🎮' },
                 { name: 'SUXIZSCX', score: 214, avatar: '💎' },
@@ -1672,147 +1032,71 @@ if (tg) {
                 { name: 'OLEG ALEKSEEV', score: 153, avatar: '💀' },
                 { name: 'WERT4567889', score: 132, avatar: '⚽' }
             ];
-            
-            saveData();
-            updateUI();
-            generateBonusCalendar();
-            generateLeaderboard();
-            updateAdminStats();
-            
+            saveData(); updateUI(); generateBonusCalendar(); generateLeaderboard(); updateAdminStats();
             showNotification('✅ Лидерборд успешно сброшен!\n\nВсе пользователи начинают с нуля.', 'success');
         }
 
-        // Админ функция для настройки лидерборда
         function manageLeaderboard() {
             if (!appData.user.isAdmin) return;
-            
-            const action = prompt(`🏆 УПРАВЛЕНИЕ ЛИДЕРБОРДОМ\n\n1 - Добавить фейкового игрока\n2 - Удалить фейкового игрока\n3 - Изменить баланс игрока\n4 - Полный сброс лидерборда\n5 - Обновить в реальном времени\n\nВведите номер действия:`);
-            
+            const action = prompt('🏆 УПРАВЛЕНИЕ ЛИДЕРБОРДОМ\n\n1 - Добавить фейкового игрока\n2 - Удалить фейкового игрока\n3 - Изменить баланс игрока\n4 - Полный сброс лидерборда\n5 - Обновить в реальном времени\n\nВведите номер действия:');
             switch(action) {
-                case '1':
-                    addFakePlayer();
-                    break;
-                case '2':
-                    removeFakePlayer();
-                    break;
-                case '3':
-                    editPlayerBalance();
-                    break;
-                case '4':
-                    resetLeaderboard();
-                    break;
-                case '5':
-                    generateLeaderboard();
-                    showNotification('✅ Лидерборд обновлен', 'success');
-                    break;
+                case '1': addFakePlayer(); break;
+                case '2': removeFakePlayer(); break;
+                case '3': editPlayerBalance(); break;
+                case '4': resetLeaderboard(); break;
+                case '5': generateLeaderboard(); showNotification('✅ Лидерборд обновлен', 'success'); break;
             }
         }
 
-        // Добавление фейкового игрока
         function addFakePlayer() {
-            const name = prompt('Введите имя игрока:');
-            if (!name) return;
-            
-            const score = parseInt(prompt('Введите баланс:'));
-            if (!score || score < 0) return;
-            
+            const name = prompt('Введите имя игрока:'); if (!name) return;
+            const score = parseInt(prompt('Введите баланс:')); if (!score || score < 0) return;
             const avatars = ['🎮', '💎', '👔', '💀', '⚽', '🎯', '🚀', '⭐', '🔥', '💫'];
             const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-            
-            appData.leaderboard.push({
-                name: name.toUpperCase(),
-                score: score,
-                avatar: avatar,
-                isReal: false
-            });
-            
-            saveData();
-            generateLeaderboard();
-            showNotification(`✅ Игрок ${name} добавлен в лидерборд`, 'success');
+            appData.leaderboard.push({ name: name.toUpperCase(), score, avatar, isReal: false });
+            saveData(); generateLeaderboard(); showNotification(`✅ Игрок ${name} добавлен в лидерборд`, 'success');
         }
 
-        // Удаление фейкового игрока
         function removeFakePlayer() {
             const fakePlayersOnly = appData.leaderboard.filter(p => !p.isReal);
-            if (fakePlayersOnly.length === 0) {
-                alert('❌ Нет фейковых игроков для удаления');
-                return;
-            }
-            
+            if (fakePlayersOnly.length === 0) { alert('❌ Нет фейковых игроков для удаления'); return; }
             let playersList = 'Выберите игрока для удаления:\n\n';
-            fakePlayersOnly.forEach((player, index) => {
-                playersList += `${index + 1}. ${player.name} (${player.score})\n`;
-            });
-            
+            fakePlayersOnly.forEach((player, index) => { playersList += `${index + 1}. ${player.name} (${player.score})\n`; });
             const playerIndex = parseInt(prompt(playersList + '\nВведите номер:')) - 1;
             if (playerIndex >= 0 && playerIndex < fakePlayersOnly.length) {
                 const playerToRemove = fakePlayersOnly[playerIndex];
                 appData.leaderboard = appData.leaderboard.filter(p => p !== playerToRemove);
-                saveData();
-                generateLeaderboard();
-                showNotification(`✅ Игрок ${playerToRemove.name} удален`, 'success');
+                saveData(); generateLeaderboard(); showNotification(`✅ Игрок ${playerToRemove.name} удален`, 'success');
             }
         }
 
-        // Изменение баланса игрока
         function editPlayerBalance() {
             let allPlayers = [...appData.leaderboard];
-            appData.users.forEach(user => {
-                if (user.balance > 0) {
-                    allPlayers.push({
-                        name: user.name,
-                        score: user.balance,
-                        isReal: true,
-                        userData: user
-                    });
-                }
-            });
-            
-            if (allPlayers.length === 0) {
-                alert('❌ Нет игроков в лидерборде');
-                return;
-            }
-            
+            appData.users.forEach(user => { if (user.balance > 0) allPlayers.push({ name: user.name, score: user.balance, isReal: true, userData: user }); });
+            if (allPlayers.length === 0) { alert('❌ Нет игроков в лидерборде'); return; }
             let playersList = 'Выберите игрока:\n\n';
-            allPlayers.forEach((player, index) => {
-                playersList += `${index + 1}. ${player.name} - ${player.score} ${player.isReal ? '(реальный)' : '(фейковый)'}\n`;
-            });
-            
+            allPlayers.forEach((player, index) => { playersList += `${index + 1}. ${player.name} - ${player.score} ${player.isReal ? '(реальный)' : '(фейковый)'}\n`; });
             const playerIndex = parseInt(prompt(playersList + '\nВведите номер:')) - 1;
             if (playerIndex >= 0 && playerIndex < allPlayers.length) {
                 const player = allPlayers[playerIndex];
                 const newBalance = parseInt(prompt(`Новый баланс для ${player.name}:`));
-                
                 if (newBalance >= 0) {
                     if (player.isReal && player.userData) {
                         player.userData.balance = newBalance;
-                        if (player.userData.id === appData.user.id) {
-                            appData.user.balance = newBalance;
-                            updateUI();
-                        }
+                        if (player.userData.id === appData.user.id) { appData.user.balance = newBalance; updateUI(); }
                     } else {
-                        // Фейковый игрок
                         const fakePlayer = appData.leaderboard.find(p => p.name === player.name);
                         if (fakePlayer) fakePlayer.score = newBalance;
                     }
-                    
-                    saveData();
-                    generateLeaderboard();
-                    showNotification(`✅ Баланс игрока ${player.name} изменен на ${newBalance}`, 'success');
+                    saveData(); generateLeaderboard(); showNotification(`✅ Баланс игрока ${player.name} изменен на ${newBalance}`, 'success');
                 }
             }
         }
 
-        function closeApp() {
-            if (tg) {
-                tg.close();
-            }
-        }
+        function closeApp() { if (tg) tg.close(); }
 
-        // Обновление таймера каждую секунду
         setInterval(updateBonusTimer, 1000);
 
-        // Сохраняем данные при закрытии/переходе
         window.addEventListener('beforeunload', () => {
             if (appData.user.id) {
                 const user = appData.users.find(u => u.id === appData.user.id);
@@ -1828,7 +1112,6 @@ if (tg) {
             saveData();
         });
 
-        // Автосохранение каждые 30 секунд
         setInterval(() => {
             if (appData.user.id) {
                 const user = appData.users.find(u => u.id === appData.user.id);
@@ -1844,19 +1127,8 @@ if (tg) {
             }
         }, 30000);
 
-        // Обработка кликов вне модальных окон
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.style.display = 'none';
-            }
-        });
-
-        // Предотвращение закрытия при клике на контент модального окна
-        document.querySelectorAll('.modal-content').forEach(content => {
-            content.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-        });
+        document.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+        document.querySelectorAll('.modal-content').forEach(content => { content.addEventListener('click', (e) => e.stopPropagation()); });
     </script>
 </body>
 </html>
