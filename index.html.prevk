@@ -634,17 +634,17 @@
             background: rgba(255,255,255,0.2);
         }
 
-        .vk-btn {
-            background: linear-gradient(45deg, #4c75a3, #2a5885);
-        }
-
         .telegram-btn {
             background: linear-gradient(45deg, #0088cc, #0066cc);
         }
 
-        
+        .appgallery-btn {
+            background: linear-gradient(45deg, #c6426e, #e74c3c);
+        }
 
-        
+        .rustore-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+        }
 
         /* Responsive */
         @media (max-width: 400px) {
@@ -792,8 +792,11 @@
                 <button class="download-btn telegram-btn" onclick="downloadTelegram()">
                     📱 TELEGRAM
                 </button>
-                <button class="download-btn vk-btn" onclick="downloadVk()">
-                    📱 VK
+                <button class="download-btn appgallery-btn" onclick="downloadAppGallery()">
+                    📱 APP GALLERY
+                </button>
+                <button class="download-btn rustore-btn" onclick="downloadRuStore()">
+                    📱 RUSTORE
                 </button>
             </div>
         </div>
@@ -895,8 +898,8 @@
             settings: {
                 adminIds: [6595683709], // ID администраторов Telegram
                 downloadLinks: {
-                    vk: 'https://vk.com',
-                    telegram: 'https://t.me/gtechmobile'
+                    Vk: 'https://t.me/gtechmobile',
+                    Telegram: 'https://appgallery.huawei.com'
                 }
             },
             users: [],
@@ -985,8 +988,612 @@ if (tg) {
                 panel.classList.remove('show');
                 panel.style.display = 'none';
             } else {
-                panel.classList.add('show');
+                updateAdminStats();
                 panel.style.display = 'block';
+                panel.classList.add('show');
+            }
+        }
+
+        // Обновление статистики админки
+        function updateAdminStats() {
+            const today = new Date().toDateString();
+            const activeToday = appData.users.filter(u => 
+                u.lastActive && new Date(u.lastActive).toDateString() === today
+            ).length;
+            
+            const totalBalance = appData.users.reduce((sum, u) => sum + (u.balance || 0), 0);
+            const promosUsed = appData.promos.reduce((sum, p) => sum + p.uses, 0);
+            
+            document.getElementById('adminUserCount').textContent = appData.users.length;
+            document.getElementById('adminActiveToday').textContent = activeToday;
+            document.getElementById('adminTotalBalance').textContent = totalBalance;
+            document.getElementById('adminPromosUsed').textContent = promosUsed;
+            document.getElementById('adminPromoCount').textContent = appData.promos.length;
+        }
+
+        // Создание промокода (админ)
+        function showCreatePromo() {
+            const promoCode = prompt('Введите код промокода (например, BONUS2024):');
+            if (!promoCode) return;
+            
+            const reward = parseInt(prompt('Введите награду (количество монет):'));
+            if (!reward || reward <= 0) {
+                alert('❌ Неверная награда!');
+                return;
+            }
+            
+            const maxUses = parseInt(prompt('Максимальное количество использований:'));
+            if (!maxUses || maxUses <= 0) {
+                alert('❌ Неверное количество использований!');
+                return;
+            }
+            
+            // Проверяем, не существует ли уже такой промокод
+            if (appData.promos.find(p => p.code === promoCode)) {
+                alert('❌ Промокод уже существует!');
+                return;
+            }
+            
+            appData.promos.push({
+                code: promoCode,
+                reward: reward,
+                uses: 0,
+                maxUses: maxUses,
+                created: new Date().toISOString(),
+                createdBy: appData.user.id
+            });
+            
+            saveData();
+            updateAdminStats();
+            
+            if (tg) {
+                tg.showAlert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
+            } else {
+                alert(`✅ Промокод "${promoCode}" создан!\nНаграда: ${reward} монет\nИспользований: ${maxUses}`);
+            }
+        }
+
+        // Управление пользователями
+        function showUserManagement() {
+            if (!appData.users.length) {
+                alert('👥 Пользователи не найдены');
+                return;
+            }
+            
+            let usersList = 'Выберите пользователя для управления:\n\n';
+            appData.users.forEach((user, index) => {
+                const lastActive = user.lastActive ? 
+                    new Date(user.lastActive).toLocaleDateString() : 'Никогда';
+                usersList += `${index + 1}. ${user.name}\n`;
+                usersList += `   ID: ${user.id}\n`;
+                usersList += `   Баланс: ${user.balance || 0}\n`;
+                usersList += `   Билеты: ${user.tickets || 0}\n`;
+                usersList += `   Последняя активность: ${lastActive}\n\n`;
+            });
+            
+            const userIndex = parseInt(prompt(usersList + 'Введите номер пользователя:')) - 1;
+            
+            if (userIndex >= 0 && userIndex < appData.users.length) {
+                manageSpecificUser(appData.users[userIndex]);
+            }
+        }
+
+        function manageSpecificUser(user) {
+            const action = prompt(`Управление пользователем ${user.name}:\n\n1 - Добавить баланс\n2 - Списать баланс\n3 - Добавить билеты\n4 - Заблокировать\n5 - Удалить\n\nВведите номер действия:`);
+            
+            switch(action) {
+                case '1':
+                    const addBalance = parseInt(prompt('Сколько монет добавить:'));
+                    if (addBalance > 0) {
+                        user.balance = (user.balance || 0) + addBalance;
+                        saveData();
+                        alert(`✅ Добавлено ${addBalance} монет пользователю ${user.name}`);
+                    }
+                    break;
+                    
+                case '2':
+                    const subBalance = parseInt(prompt('Сколько монет списать:'));
+                    if (subBalance > 0) {
+                        user.balance = Math.max(0, (user.balance || 0) - subBalance);
+                        saveData();
+                        alert(`✅ Списано ${subBalance} монет у пользователя ${user.name}`);
+                    }
+                    break;
+                    
+                case '3':
+                    const addTickets = parseInt(prompt('Сколько билетов добавить:'));
+                    if (addTickets > 0) {
+                        user.tickets = (user.tickets || 0) + addTickets;
+                        saveData();
+                        alert(`✅ Добавлено ${addTickets} билетов пользователю ${user.name}`);
+                    }
+                    break;
+                    
+                case '4':
+                    user.blocked = !user.blocked;
+                    saveData();
+                    alert(`✅ Пользователь ${user.name} ${user.blocked ? 'заблокирован' : 'разблокирован'}`);
+                    break;
+                    
+                case '5':
+                    if (confirm(`Удалить пользователя ${user.name}?`)) {
+                        appData.users = appData.users.filter(u => u.id !== user.id);
+                        saveData();
+                        alert(`✅ Пользователь ${user.name} удален`);
+                    }
+                    break;
+            }
+        }
+
+        // Управление промокодами
+        function showPromoManagement() {
+            if (!appData.promos.length) {
+                alert('🎫 Промокоды не найдены');
+                return;
+            }
+            
+            let promosList = 'Управление промокодами:\n\n';
+            appData.promos.forEach((promo, index) => {
+                promosList += `${index + 1}. ${promo.code}\n`;
+                promosList += `   Награда: ${promo.reward}\n`;
+                promosList += `   Использовано: ${promo.uses}/${promo.maxUses}\n`;
+                promosList += `   Создан: ${new Date(promo.created).toLocaleDateString()}\n\n`;
+            });
+            
+            const promoIndex = parseInt(prompt(promosList + 'Введите номер для удаления (или 0 для отмены):')) - 1;
+            
+            if (promoIndex >= 0 && promoIndex < appData.promos.length) {
+                if (confirm(`Удалить промокод "${appData.promos[promoIndex].code}"?`)) {
+                    appData.promos.splice(promoIndex, 1);
+                    saveData();
+                    alert('✅ Промокод удален');
+                }
+            }
+        }
+
+        // Управление ссылками
+        function showLinkManagement() {
+            const platform = prompt('Какую ссылку изменить?\n\n1 - Telegram\n2 - AppGallery\n3 - RuStore\n\nВведите номер:');
+            
+            let currentLink = '';
+            let linkType = '';
+            
+            switch(platform) {
+                case '1':
+                    currentLink = appData.settings.downloadLinks.telegram;
+                    linkType = 'telegram';
+                    break;
+                case '2':
+                    currentLink = appData.settings.downloadLinks.appgallery;
+                    linkType = 'appgallery';
+                    break;
+                case '3':
+                    currentLink = appData.settings.downloadLinks.rustore;
+                    linkType = 'rustore';
+                    break;
+                default:
+                    return;
+            }
+            
+            const newLink = prompt(`Текущая ссылка:\n${currentLink}\n\nВведите новую ссылку:`);
+            if (newLink) {
+                appData.settings.downloadLinks[linkType] = newLink;
+                saveData();
+                alert('✅ Ссылка обновлена');
+            }
+        }
+
+        // Экспорт данных
+        function exportData() {
+            const data = {
+                users: appData.users,
+                promos: appData.promos,
+                statistics: {
+                    totalUsers: appData.users.length,
+                    totalBalance: appData.users.reduce((sum, u) => sum + (u.balance || 0), 0),
+                    activeToday: appData.users.filter(u => 
+                        u.lastActive && new Date(u.lastActive).toDateString() === new Date().toDateString()
+                    ).length,
+                    exportDate: new Date().toISOString()
+                }
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            
+            if (tg) {
+                // В реальном приложении можно отправить данные в бот
+                tg.sendData(dataStr);
+            } else {
+                // Для демонстрации показываем alert
+                alert('📊 Данные экспортированы в консоль браузера');
+                console.log('Экспорт данных:', data);
+            }
+        }
+
+        // Модальные окна
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openDownloadModal() {
+            openModal('downloadModal');
+        }
+
+        function openBonusModal() {
+            openModal('bonusModal');
+            generateBonusCalendar();
+        }
+
+        function openPromoModal() {
+            openModal('promoModal');
+        }
+
+        function openLeaderboard() {
+            openModal('leaderboardModal');
+            generateLeaderboard();
+        }
+
+        function openShop() {
+            openModal('shopModal');
+        }
+
+        // Хранилище предметов
+        function openStorage() {
+            if (!appData.user.inventory || appData.user.inventory.length === 0) {
+                alert('📦 Ваше хранилище пусто\n\nПокупайте товары в магазине!');
+                return;
+            }
+            
+            let storageList = '📦 ХРАНИЛИЩЕ ПРЕДМЕТОВ\n\n';
+            
+            const statusText = {
+                pending: '⏳ Ожидает вывода',
+                processing: '🔄 В обработке',
+                delivered: '✅ Доставлено'
+            };
+            
+            appData.user.inventory.forEach((item, index) => {
+                const purchaseDate = new Date(item.purchaseDate).toLocaleDateString();
+                storageList += `${index + 1}. ${item.item}\n`;
+                storageList += `   Категория: ${item.category}\n`;
+                storageList += `   Куплено: ${purchaseDate}\n`;
+                storageList += `   Статус: ${statusText[item.status] || '❓ Неизвестно'}\n\n`;
+            });
+            
+            storageList += 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\n';
+            storageList += 'Powered by Gtech Mobile';
+            
+            alert(storageList);
+        }
+
+        // Генерация календаря бонусов
+        function generateBonusCalendar() {
+            const bonusGrid = document.getElementById('bonusGrid');
+            const rewards = [5, 10, 15, 15, 15, 15, 15, 15, 15];
+            const today = new Date().getDate();
+            
+            bonusGrid.innerHTML = '';
+            
+            for (let i = 1; i <= 9; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'bonus-day';
+                
+                if (i <= appData.user.bonusDays) {
+                    dayElement.classList.add('claimed');
+                } else if (i === appData.user.bonusDays + 1 && canClaimBonus()) {
+                    dayElement.classList.add('active');
+                    dayElement.onclick = () => claimBonus(i);
+                }
+                
+                dayElement.innerHTML = `
+                    <div class="bonus-day-number">${i} ДЕНЬ</div>
+                    <div class="bonus-reward">
+                        <div class="coin-icon">₽</div>
+                        <span>${rewards[i-1]}</span>
+                    </div>
+                `;
+                
+                bonusGrid.appendChild(dayElement);
+            }
+            
+            updateBonusTimer();
+        }
+
+        // Проверка возможности получения бонуса
+        function canClaimBonus() {
+            const now = new Date();
+            const lastBonus = appData.user.lastBonusDate ? new Date(appData.user.lastBonusDate) : null;
+            
+            if (!lastBonus) return true;
+            
+            const timeDiff = now.getTime() - lastBonus.getTime();
+            const hoursDiff = timeDiff / (1000 * 3600);
+            
+            return hoursDiff >= 24;
+        }
+
+        // Улучшенное получение бонуса
+        function claimBonus(day) {
+            if (!canClaimBonus()) {
+                showNotification('❌ Бонус ещё не доступен!', 'error');
+                return;
+            }
+            
+            const rewards = [5, 10, 15, 15, 15, 15, 15, 15, 15];
+            const reward = rewards[day - 1];
+            
+            appData.user.balance += reward;
+            appData.user.bonusDays = Math.max(appData.user.bonusDays, day);
+            appData.user.lastBonusDate = new Date().toISOString();
+            
+            // Дополнительная награда за серию
+            if (day === 7) {
+                appData.user.balance += 50; // Бонус за неделю
+                showNotification(`🎉 Недельный бонус!\nВы получили ${reward} + 50 (недельный бонус) = ${reward + 50} монет!`, 'success');
+            } else if (day === 9) {
+                appData.user.tickets += 1; // Билет за полную серию
+                showNotification(`🎊 Полная серия!\nВы получили ${reward} монет + 1 билет!`, 'success');
+            } else {
+                showNotification(`🎉 Ежедневный бонус!\nВы получили ${reward} монет!`, 'success');
+            }
+            
+            saveData();
+            updateUI();
+            generateBonusCalendar();
+            logUserActivity(`bonus_day_${day}`);
+        }
+
+        // Улучшенная инициализация приложения
+        window.addEventListener('load', () => {
+            loadData();
+            
+            // Добавляем пользователя в базу если его нет
+            if (appData.user.id) {
+                let user = appData.users.find(u => u.id === appData.user.id);
+                if (!user) {
+                    user = {
+                        id: appData.user.id,
+                        name: appData.user.name,
+                        balance: appData.user.balance,
+                        tickets: appData.user.tickets,
+                        joinDate: new Date().toISOString(),
+                        lastActive: new Date().toISOString(),
+                        bonusDays: appData.user.bonusDays,
+                        usedPromos: appData.user.usedPromos,
+                        inventory: appData.user.inventory || [],
+                        activities: []
+                    };
+                    appData.users.push(user);
+                } else {
+                    // Обновляем данные существующего пользователя
+                    user.name = appData.user.name;
+                    user.lastActive = new Date().toISOString();
+                    user.balance = appData.user.balance;
+                    user.tickets = appData.user.tickets;
+                }
+                saveData();
+            }
+
+            // Автоматическое обновление лидерборда
+            setInterval(() => {
+                if (document.getElementById('leaderboardModal').style.display === 'flex') {
+                    generateLeaderboard();
+                }
+            }, 30000); // Обновляем каждые 30 секунд
+        });
+
+        // Обновление таймера бонуса
+        function updateBonusTimer() {
+            const timerElement = document.getElementById('bonusTimer');
+            if (!appData.user.lastBonusDate) {
+                timerElement.textContent = 'Бонус доступен сейчас!';
+                return;
+            }
+            
+            const lastBonus = new Date(appData.user.lastBonusDate);
+            const nextBonus = new Date(lastBonus.getTime() + 24 * 60 * 60 * 1000);
+            const now = new Date();
+            
+            if (now >= nextBonus) {
+                timerElement.textContent = 'Бонус доступен сейчас!';
+                return;
+            }
+            
+            const timeDiff = nextBonus.getTime() - now.getTime();
+            const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+            
+            timerElement.textContent = `Можно забрать бонус через: ${hours}ч. ${minutes}м. ${seconds}сек.`;
+        }
+
+        // Генерация лидерборда в реальном времени
+        function generateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+            
+            // Создаем массив всех игроков (реальные пользователи + текущий пользователь)
+            let allPlayers = [...appData.leaderboard]; // Начальные фейковые игроки
+            
+            // Добавляем всех реальных пользователей
+            appData.users.forEach(user => {
+                if (user.balance > 0) {
+                    // Удаляем фейкового игрока если есть реальный с таким же именем
+                    allPlayers = allPlayers.filter(p => p.name.toUpperCase() !== user.name.toUpperCase());
+                    
+                    allPlayers.push({
+                        name: user.name.toUpperCase(),
+                        score: user.balance,
+                        avatar: getUserAvatar(user.name),
+                        isReal: true,
+                        id: user.id,
+                        lastActive: user.lastActive
+                    });
+                }
+            });
+            
+            // Сортируем по убыванию баланса
+            allPlayers.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                // При равном балансе сортируем по активности (реальные игроки выше)
+                if (a.isReal && !b.isReal) return -1;
+                if (!a.isReal && b.isReal) return 1;
+                return 0;
+            });
+            
+            // Показываем топ-50 игроков
+            const topPlayers = allPlayers.slice(0, 50);
+            
+            topPlayers.forEach((player, index) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'leaderboard-item';
+                
+                // Подсвечиваем текущего пользователя
+                if (player.id === appData.user.id) {
+                    playerElement.style.background = 'linear-gradient(45deg, rgba(241, 196, 15, 0.2), rgba(243, 156, 18, 0.2))';
+                    playerElement.style.border = '2px solid #f1c40f';
+                }
+                
+                // Особые стили для топ-3
+                let rankStyle = '';
+                if (index === 0) rankStyle = 'color: #f1c40f; font-size: 20px;'; // Золото
+                else if (index === 1) rankStyle = 'color: #95a5a6; font-size: 18px;'; // Серебро  
+                else if (index === 2) rankStyle = 'color: #e67e22; font-size: 16px;'; // Бронза
+                
+                playerElement.innerHTML = `
+                    <div class="rank" style="${rankStyle}">#${index + 1}</div>
+                    <div class="player-avatar">${player.avatar}</div>
+                    <div class="player-info">
+                        <div class="player-name">
+                            ${player.name}
+                            ${player.isReal ? '<span style="color: #2ecc71; font-size: 12px;">●</span>' : '<span style="color: #95a5a6; font-size: 12px;">○</span>'}
+                        </div>
+                        <div class="player-score">
+                            <div class="coin-icon">₽</div>
+                            <span>+${player.score}</span>
+                            ${player.lastActive ? `<span style="font-size: 10px; color: #95a5a6; margin-left: 5px;">${getTimeAgo(player.lastActive)}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                leaderboardList.appendChild(playerElement);
+            });
+            
+            // Обновляем заголовок с количеством игроков
+            const modalTitle = document.querySelector('#leaderboardModal .modal-title');
+            if (modalTitle) {
+                modalTitle.textContent = `ТОП АКТИВНЫХ ИГРОКОВ (${topPlayers.length})`;
+            }
+        }
+
+        // Получение аватара для пользователя
+        function getUserAvatar(name) {
+            const avatars = ['🎮', '💎', '👔', '💀', '⚽', '🎯', '🚀', '⭐', '🔥', '💫', '🎪', '🎨', '🎭', '🎪', '🏆'];
+            const nameHash = name.split('').reduce((hash, char) => hash + char.charCodeAt(0), 0);
+            return avatars[nameHash % avatars.length];
+        }
+
+        // Функция для показа времени "назад"
+        function getTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'сейчас';
+            if (diffMins < 60) return `${diffMins}м`;
+            if (diffHours < 24) return `${diffHours}ч`;
+            if (diffDays < 7) return `${diffDays}д`;
+            return 'давно';
+        }
+
+        // Обработка клика по логотипу (оставляем для обычных пользователей как пасхалку)
+        function handleLogoClick() {
+            if (appData.user.isAdmin) {
+                toggleAdminPanel();
+                return;
+            }
+            
+            appData.adminClicks++;
+            if (appData.adminClicks >= 7) {
+                alert('🎊 Поздравляем!\n\nВы нашли секретную пасхалку!\n\n+50 монет к балансу!');
+                appData.user.balance += 50;
+                appData.adminClicks = 0;
+                saveData();
+                updateUI();
+                logUserActivity('easter_egg');
+            } else {
+                const remaining = 7 - appData.adminClicks;
+                if (remaining <= 3) {
+                    // Подсказка когда осталось мало кликов
+                    console.log(`Осталось кликов: ${remaining}`);
+                }
+            }
+        }
+
+        // Улучшенная система промокодов с уведомлениями
+        function activatePromo() {
+            const promoCode = document.getElementById('promoInput').value.trim().toUpperCase();
+            
+            if (!promoCode) {
+                showNotification('❌ Введите промокод!', 'error');
+                return;
+            }
+            
+            // Проверяем, не использовался ли промокод
+            if (appData.user.usedPromos.includes(promoCode)) {
+                showNotification('❌ Промокод уже использован!', 'error');
+                return;
+            }
+            
+            // Ищем промокод
+            const promo = appData.promos.find(p => p.code.toUpperCase() === promoCode);
+            
+            if (!promo) {
+                showNotification('❌ Промокод не найден!', 'error');
+                return;
+            }
+            
+            // Проверяем лимит использований
+            if (promo.uses >= promo.maxUses) {
+                showNotification('❌ Промокод исчерпан!', 'error');
+                return;
+            }
+            
+            // Активируем промокод
+            appData.user.balance += promo.reward;
+            appData.user.usedPromos.push(promoCode);
+            promo.uses++;
+            
+            saveData();
+            updateUI();
+            closeModal('promoModal');
+            logUserActivity(`promo_${promoCode}`);
+            
+            showNotification(`🎉 Промокод активирован!\nПолучено ${promo.reward} монет!`, 'success');
+            document.getElementById('promoInput').value = '';
+        }
+
+        // Система уведомлений
+        function showNotification(message, type = 'info') {
+            if (tg) {
+                if (type === 'error') {
+                    tg.showAlert(message);
+                } else {
+                    tg.showPopup({
+                        title: type === 'success' ? 'Успех!' : 'Уведомление',
+                        message: message,
+                        buttons: [{type: 'ok'}]
+                    });
+                }
+            } else {
+                alert(message);
             }
         }
 
@@ -1003,15 +1610,26 @@ if (tg) {
             logUserActivity('download_telegram');
         }
 
-        function downloadVk() {
-            const link = appData.settings.downloadLinks.vk;
+        function downloadAppGallery() {
+            const link = appData.settings.downloadLinks.appgallery;
             if (tg) {
                 tg.openLink(link);
             } else {
                 window.open(link, '_blank');
             }
             
-            logUserActivity('download_vk');
+            logUserActivity('download_appgallery');
+        }
+
+        function downloadRuStore() {
+            const link = appData.settings.downloadLinks.rustore;
+            if (tg) {
+                tg.openLink(link);
+            } else {
+                window.open(link, '_blank');
+            }
+            
+            logUserActivity('download_rustore');
         }
 
         // Логирование активности пользователя
@@ -1277,34 +1895,6 @@ if (tg) {
                 e.stopPropagation();
             });
         });
-
-        // Управление ссылками
-        function showLinkManagement() {
-            const platform = prompt('Какую ссылку изменить?\n\n1 - Telegram\n2 - VK\n\nВведите номер:');
-            
-            let currentLink = '';
-            let linkType = '';
-            
-            switch(platform) {
-                case '1':
-                    currentLink = appData.settings.downloadLinks.telegram;
-                    linkType = 'telegram';
-                    break;
-                case '2':
-                    currentLink = appData.settings.downloadLinks.vk;
-                    linkType = 'vk';
-                    break;
-                default:
-                    return;
-            }
-            
-            const newLink = prompt(`Текущая ссылка:\n${currentLink}\n\nВведите новую ссылку:`);
-            if (newLink) {
-                appData.settings.downloadLinks[linkType] = newLink;
-                saveData();
-                alert('✅ Ссылка обновлена');
-            }
-        }
     </script>
 </body>
 </html>
