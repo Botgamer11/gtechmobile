@@ -422,52 +422,7 @@
             text-transform: uppercase;
         }
 
-        /* Магазин категории */
-        .shop-categories {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .shop-category {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .shop-category:nth-child(1) {
-            background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%);
-        }
-
-        .shop-category:nth-child(2) {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        }
-
-        .shop-category:nth-child(3) {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        }
-
-        .shop-category:nth-child(4) {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-        }
-
-        .shop-category:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-        }
-
-        .shop-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
+        /* Магазин категории: удалено */
 
         .shop-title {
             font-size: 12px;
@@ -682,7 +637,7 @@
         </header>
 
         <div class="user-info">
-            <div class="user-name" id="userName">ВАНЯ ФИЛАТОВ</div>
+            <div class="user-name" id="userName">ГОСТЬ</div>
             
             <div class="balance-section">
                 <div class="balance-item">
@@ -714,10 +669,7 @@
                 <div class="grid-icon">📊</div>
                 <div class="grid-title">ТОП АКТИВНЫХ<br>ИГРОКОВ</div>
             </div>
-            <div class="grid-item" onclick="openModal('shopModal')">
-                <div class="grid-icon">🛒</div>
-                <div class="grid-title">МАГАЗИН ИГРОВЫХ<br>ТОВАРОВ</div>
-            </div>
+            
         </div>
 
         <div class="bottom-actions">
@@ -725,10 +677,7 @@
                 <span class="action-icon">🎁</span>
                 БОНУСНЫЕ МОНЕТЫ
             </button>
-            <button class="bottom-btn" onclick="openStorage()">
-                <span class="action-icon">📦</span>
-                ХРАНИЛИЩЕ ПРЕДМЕТОВ
-            </button>
+            
             <button class="bottom-btn" onclick="openModal('promoModal')">
                 <span class="action-icon">🏷️</span>
                 ВВЕСТИ ПРОМОКОД
@@ -851,35 +800,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно магазина -->
-    <div class="modal" id="shopModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">МАГАЗИН ИГРОВЫХ ТОВАРОВ</div>
-                <button class="close-btn" onclick="closeModal('shopModal')">✕</button>
-            </div>
-            <div class="modal-subtitle">Все выводы товаров происходят каждый понедельник с 00:00 по 23:00</div>
-            
-            <div class="shop-categories">
-                <div class="shop-category" onclick="openCategory('transport')">
-                    <div class="shop-icon">🚗</div>
-                    <div class="shop-title">УНИКАЛЬНЫЙ<br>ТРАНСПОРТ</div>
-                </div>
-                <div class="shop-category" onclick="openCategory('skins')">
-                    <div class="shop-icon">👤</div>
-                    <div class="shop-title">УНИКАЛЬНЫЕ<br>СКИНЫ</div>
-                </div>
-                <div class="shop-category" onclick="openCategory('items')">
-                    <div class="shop-icon">👓</div>
-                    <div class="shop-title">УНИКАЛЬНЫЕ<br>ПРЕДМЕТЫ</div>
-                </div>
-                <div class="shop-category" onclick="openCategory('currency')">
-                    <div class="shop-icon">₽</div>
-                    <div class="shop-title">ВИРТУАЛЬНАЯ<br>ВАЛЮТА</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <script>
         let appData = {
@@ -952,6 +873,13 @@ if (tg) {
             showAdminInterface();
         }
     }
+} else {
+    // Браузер: показываем гостя и отключаем админ-интерфейс
+    appData.user.name = 'ГОСТЬ';
+    appData.user.id = null;
+    appData.user.isAdmin = false;
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) userNameEl.textContent = appData.user.name;
 }
 
         // Загрузка данных из localStorage
@@ -960,6 +888,13 @@ if (tg) {
             if (saved) {
                 const parsedData = JSON.parse(saved);
                 appData = { ...appData, ...parsedData };
+                updateUI();
+            }
+            // В браузере всегда остаемся гостем
+            if (!tg) {
+                appData.user.name = 'ГОСТЬ';
+                appData.user.id = null;
+                appData.user.isAdmin = false;
                 updateUI();
             }
             generateBonusCalendar();
@@ -1243,38 +1178,7 @@ if (tg) {
             generateLeaderboard();
         }
 
-        function openShop() {
-            openModal('shopModal');
-        }
-
-        // Хранилище предметов
-        function openStorage() {
-            if (!appData.user.inventory || appData.user.inventory.length === 0) {
-                alert('📦 Ваше хранилище пусто\n\nПокупайте товары в магазине!');
-                return;
-            }
-            
-            let storageList = '📦 ХРАНИЛИЩЕ ПРЕДМЕТОВ\n\n';
-            
-            const statusText = {
-                pending: '⏳ Ожидает вывода',
-                processing: '🔄 В обработке',
-                delivered: '✅ Доставлено'
-            };
-            
-            appData.user.inventory.forEach((item, index) => {
-                const purchaseDate = new Date(item.purchaseDate).toLocaleDateString();
-                storageList += `${index + 1}. ${item.item}\n`;
-                storageList += `   Категория: ${item.category}\n`;
-                storageList += `   Куплено: ${purchaseDate}\n`;
-                storageList += `   Статус: ${statusText[item.status] || '❓ Неизвестно'}\n\n`;
-            });
-            
-            storageList += 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\n';
-            storageList += 'Powered by Atrium Online';
-            
-            alert(storageList);
-        }
+        // Магазин/Хранилище: функционал удалён
 
         // Генерация календаря бонусов
         function generateBonusCalendar() {
@@ -1660,17 +1564,7 @@ if (tg) {
             }
         }
 
-        // Категории магазина
-        function openCategory(category) {
-            const categoryNames = {
-                transport: 'УНИКАЛЬНЫЙ ТРАНСПОРТ',
-                skins: 'УНИКАЛЬНЫЕ СКИНЫ', 
-                items: 'УНИКАЛЬНЫЕ ПРЕДМЕТЫ',
-                currency: 'ВИРТУАЛЬНАЯ ВАЛЮТА'
-            };
-            
-            alert(`🛍️ ${categoryNames[category]}\n\nВсе выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\nPowered by Atrium Online`);
-        }
+        // Категории магазина (удалено)
 
         // Админ функция для сброса лидерборда
         function resetLeaderboard() {
