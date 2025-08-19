@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gtech Mobile</title>
+    <link rel="preconnect" href="https://telegram.org" crossorigin>
+    <link rel="dns-prefetch" href="//telegram.org">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -703,14 +705,14 @@
                 <span class="action-icon">⬇</span>
                 СКАЧАТЬ ИГРУ
             </button>
-            <button class="action-btn gift-btn" onclick="openModal('bonusModal')">
+            <button class="action-btn gift-btn" onclick="openBonusModal()">
                 <span class="action-icon">🎁</span>
                 ПОЛУЧИТЬ ПОДАРОК
             </button>
         </div>
 
         <div class="grid-section">
-            <div class="grid-item" onclick="openModal('leaderboardModal')">
+            <div class="grid-item" onclick="openLeaderboard()">
                 <div class="grid-icon">📊</div>
                 <div class="grid-title">ТОП АКТИВНЫХ<br>ИГРОКОВ</div>
             </div>
@@ -721,7 +723,7 @@
         </div>
 
         <div class="bottom-actions">
-            <button class="bottom-btn" onclick="openModal('bonusModal')">
+            <button class="bottom-btn" onclick="openBonusModal()">
                 <span class="action-icon">🎁</span>
                 БОНУСНЫЕ МОНЕТЫ
             </button>
@@ -878,6 +880,30 @@
                     <div class="shop-title">ВИРТУАЛЬНАЯ<br>ВАЛЮТА</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно хранилища -->
+    <div class="modal" id="storageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ХРАНИЛИЩЕ ПРЕДМЕТОВ</div>
+                <button class="close-btn" onclick="closeModal('storageModal')">✕</button>
+            </div>
+            <div class="modal-subtitle" id="storageSubtitle">Все выводы товаров происходят каждый понедельник с 00:00 по 23:00</div>
+            <div id="storageList"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно категории магазина -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="categoryTitle">КАТЕГОРИЯ</div>
+                <button class="close-btn" onclick="closeModal('categoryModal')">✕</button>
+            </div>
+            <div class="modal-subtitle" id="categorySubtitle">Все выводы товаров происходят каждый понедельник с 00:00 по 23:00</div>
+            <div id="categoryBody"></div>
         </div>
     </div>
 
@@ -1217,12 +1243,23 @@ if (tg) {
         }
 
         // Модальные окна
+        let bonusTimerIntervalId = null;
+        let leaderboardIntervalId = null;
+
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'bonusModal' && bonusTimerIntervalId) {
+                clearInterval(bonusTimerIntervalId);
+                bonusTimerIntervalId = null;
+            }
+            if (modalId === 'leaderboardModal' && leaderboardIntervalId) {
+                clearInterval(leaderboardIntervalId);
+                leaderboardIntervalId = null;
+            }
         }
 
         function openDownloadModal() {
@@ -1232,6 +1269,9 @@ if (tg) {
         function openBonusModal() {
             openModal('bonusModal');
             generateBonusCalendar();
+            updateBonusTimer();
+            if (bonusTimerIntervalId) clearInterval(bonusTimerIntervalId);
+            bonusTimerIntervalId = setInterval(updateBonusTimer, 1000);
         }
 
         function openPromoModal() {
@@ -1241,6 +1281,8 @@ if (tg) {
         function openLeaderboard() {
             openModal('leaderboardModal');
             generateLeaderboard();
+            if (leaderboardIntervalId) clearInterval(leaderboardIntervalId);
+            leaderboardIntervalId = setInterval(generateLeaderboard, 30000);
         }
 
         function openShop() {
@@ -1249,31 +1291,40 @@ if (tg) {
 
         // Хранилище предметов
         function openStorage() {
+            const listContainer = document.getElementById('storageList');
+            const subtitle = document.getElementById('storageSubtitle');
+            
+            subtitle.textContent = 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00';
+            listContainer.innerHTML = '';
+            
             if (!appData.user.inventory || appData.user.inventory.length === 0) {
-                alert('📦 Ваше хранилище пусто\n\nПокупайте товары в магазине!');
-                return;
+                const empty = document.createElement('div');
+                empty.className = 'modal-subtitle';
+                empty.textContent = '📦 Ваше хранилище пусто. Покупайте товары в магазине!';
+                listContainer.appendChild(empty);
+            } else {
+                const statusText = {
+                    pending: '⏳ Ожидает вывода',
+                    processing: '🔄 В обработке',
+                    delivered: '✅ Доставлено'
+                };
+                
+                appData.user.inventory.forEach((item) => {
+                    const purchaseDate = new Date(item.purchaseDate).toLocaleDateString();
+                    const row = document.createElement('div');
+                    row.className = 'leaderboard-item';
+                    row.innerHTML = `
+                        <div class="player-avatar">📦</div>
+                        <div class="player-info">
+                            <div class="player-name">${item.item}</div>
+                            <div class="player-score"><span style="color:#a0a0a0; font-size:12px;">Категория: ${item.category} • Куплено: ${purchaseDate} • Статус: ${statusText[item.status] || '❓ Неизвестно'}</span></div>
+                        </div>
+                    `;
+                    listContainer.appendChild(row);
+                });
             }
             
-            let storageList = '📦 ХРАНИЛИЩЕ ПРЕДМЕТОВ\n\n';
-            
-            const statusText = {
-                pending: '⏳ Ожидает вывода',
-                processing: '🔄 В обработке',
-                delivered: '✅ Доставлено'
-            };
-            
-            appData.user.inventory.forEach((item, index) => {
-                const purchaseDate = new Date(item.purchaseDate).toLocaleDateString();
-                storageList += `${index + 1}. ${item.item}\n`;
-                storageList += `   Категория: ${item.category}\n`;
-                storageList += `   Куплено: ${purchaseDate}\n`;
-                storageList += `   Статус: ${statusText[item.status] || '❓ Неизвестно'}\n\n`;
-            });
-            
-            storageList += 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\n';
-            storageList += 'Powered by Atrium Online';
-            
-            alert(storageList);
+            openModal('storageModal');
         }
 
         // Генерация календаря бонусов
@@ -1383,13 +1434,6 @@ if (tg) {
                 }
                 saveData();
             }
-
-            // Автоматическое обновление лидерборда
-            setInterval(() => {
-                if (document.getElementById('leaderboardModal').style.display === 'flex') {
-                    generateLeaderboard();
-                }
-            }, 30000); // Обновляем каждые 30 секунд
         });
 
         // Обновление таймера бонуса
@@ -1669,10 +1713,22 @@ if (tg) {
                 currency: 'ВИРТУАЛЬНАЯ ВАЛЮТА'
             };
             
-            alert(`🛍️ ${categoryNames[category]}\n\nВсе выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\nPowered by Atrium Online`);
+            const titleEl = document.getElementById('categoryTitle');
+            const subtitleEl = document.getElementById('categorySubtitle');
+            const bodyEl = document.getElementById('categoryBody');
+            
+            titleEl.textContent = categoryNames[category] || 'КАТЕГОРИЯ';
+            subtitleEl.textContent = 'Все выводы товаров происходят каждый понедельник с 00:00 по 23:00\n\nPowered by Gtech Mobile';
+            
+            bodyEl.innerHTML = '';
+            const info = document.createElement('div');
+            info.className = 'modal-subtitle';
+            info.textContent = 'Скоро здесь появятся товары этой категории.';
+            bodyEl.appendChild(info);
+            
+            openModal('categoryModal');
         }
 
-        // Админ функция для сброса лидерборда
         function resetLeaderboard() {
             if (!appData.user.isAdmin) {
                 showNotification('❌ Нет доступа!', 'error');
@@ -1853,9 +1909,6 @@ if (tg) {
             }
         }
 
-        // Обновление таймера каждую секунду
-        setInterval(updateBonusTimer, 1000);
-
         // Сохраняем данные при закрытии/переходе
         window.addEventListener('beforeunload', () => {
             if (appData.user.id) {
@@ -1891,7 +1944,7 @@ if (tg) {
         // Обработка кликов вне модальных окон
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
-                e.target.style.display = 'none';
+                closeModal(e.target.id);
             }
         });
 
