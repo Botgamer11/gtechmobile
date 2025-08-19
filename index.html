@@ -725,6 +725,14 @@
                 <span class="action-icon">🏷️</span>
                 ВВЕСТИ ПРОМОКОД
             </button>
+            <button class="bottom-btn" onclick="openExchangeModal()">
+                <span class="action-icon">🔄</span>
+                ОБМЕН РУБЛЕЙ НА БИЛЕТЫ
+            </button>
+            <button class="bottom-btn" onclick="openWithdrawModal()">
+                <span class="action-icon">💸</span>
+                ВЫВОД БИЛЕТОВ
+            </button>
         </div>
     </div>
 
@@ -761,6 +769,8 @@
             <button class="admin-btn" onclick="showPromoManagement()">🎫 Управление промокодами</button>
             <button class="admin-btn" onclick="manageLeaderboard()">🏆 Управление лидербордом</button>
             <button class="admin-btn" onclick="showLinkManagement()">🔗 Управление ссылками</button>
+            <button class="admin-btn" onclick="showWithdrawRequests()">💸 Запросы выводов</button>
+            <button class="admin-btn" onclick="toggleWithdrawals()">🔌 Переключить выводы</button>
             <button class="admin-btn" onclick="exportData()">📊 Экспорт данных</button>
             <button class="admin-btn" onclick="resetLeaderboard()" style="background: rgba(231, 76, 60, 0.3);">🔄 СБРОС ЛИДЕРБОРДА</button>
             <button class="admin-btn" onclick="toggleAdminPanel()" style="background: rgba(255,255,255,0.1);">❌ Закрыть панель</button>
@@ -843,6 +853,34 @@
         </div>
     </div>
 
+    <!-- Модальное окно обмена -->
+    <div class="modal" id="exchangeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ОБМЕН РУБЛЕЙ НА БИЛЕТЫ</div>
+                <button class="close-btn" onclick="closeModal('exchangeModal')">✕</button>
+            </div>
+            <div class="modal-subtitle">Курс: 10 ₽ → 2 билета. Минимум к обмену: 100 ₽. Сумма должна быть кратна 10.</div>
+            <input type="number" class="promo-input" id="exchangeAmountInput" placeholder="Сумма в ₽ (мин. 100)" oninput="updateExchangeResult()">
+            <div class="modal-subtitle" id="exchangeResult">Вы получите: 0 билетов</div>
+            <button class="promo-submit" onclick="performExchange()">ОБМЕНЯТЬ</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно вывода -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ВЫВОД БИЛЕТОВ</div>
+                <button class="close-btn" onclick="closeModal('withdrawModal')">✕</button>
+            </div>
+            <div class="modal-subtitle" id="withdrawStatusText">Проверка статуса выводов...</div>
+            <input type="text" class="promo-input" id="withdrawNicknameInput" placeholder="Ник (куда зачислить)">
+            <input type="number" class="promo-input" id="withdrawTicketsInput" placeholder="Количество билетов (мин. 50)">
+            <button class="promo-submit" onclick="submitWithdrawalRequest()">ОТПРАВИТЬ ЗАЯВКУ</button>
+        </div>
+    </div>
+
     <script>
         let appData = {
     user: {
@@ -859,9 +897,11 @@
     // ... остальные данные
             settings: {
                 adminIds: [6595683709], // ID администраторов Telegram
+                withdrawalsEnabled: true,
                 downloadLinks: {
-                    Vk: 'https://t.me/gtechmobile',
-                    Telegram: 'https://appgallery.huawei.com'
+                    telegram: 'https://t.me/gtechmobile',
+                    appgallery: 'https://appgallery.huawei.com',
+                    rustore: 'https://discord.com'
                 }
             },
             users: [],
@@ -871,6 +911,7 @@
             ],
             leaderboard: [
             ],
+            withdrawals: [],
             adminClicks: 0,
             statistics: {
                 totalUsers: 0,
@@ -916,6 +957,16 @@ if (tg) {
             if (saved) {
                 const parsedData = JSON.parse(saved);
                 appData = { ...appData, ...parsedData };
+                // Обновляем новые поля по умолчанию для старых сохранений
+                if (!appData.settings) appData.settings = {};
+                if (typeof appData.settings.withdrawalsEnabled === 'undefined') {
+                    appData.settings.withdrawalsEnabled = true;
+                }
+                if (!appData.settings.downloadLinks) appData.settings.downloadLinks = {};
+                appData.settings.downloadLinks.telegram = appData.settings.downloadLinks.telegram || 'https://t.me/gtechmobile';
+                appData.settings.downloadLinks.appgallery = appData.settings.downloadLinks.appgallery || 'https://appgallery.huawei.com';
+                appData.settings.downloadLinks.rustore = appData.settings.downloadLinks.rustore || 'https://discord.com';
+                if (!Array.isArray(appData.withdrawals)) appData.withdrawals = [];
                 updateUI();
             }
             generateBonusCalendar();
@@ -932,6 +983,35 @@ if (tg) {
             document.getElementById('balance').textContent = appData.user.balance;
             document.getElementById('tickets').textContent = appData.user.tickets;
             document.getElementById('userName').textContent = appData.user.name;
+        }
+
+        // Синхронизация текущего пользователя с базой пользователей
+        function syncCurrentUserToUsers() {
+            if (!appData.user.id) return;
+            let user = appData.users.find(u => u.id === appData.user.id);
+            if (!user) {
+                user = {
+                    id: appData.user.id,
+                    name: appData.user.name,
+                    balance: appData.user.balance,
+                    tickets: appData.user.tickets,
+                    joinDate: new Date().toISOString(),
+                    lastActive: new Date().toISOString(),
+                    bonusDays: appData.user.bonusDays,
+                    usedPromos: appData.user.usedPromos,
+                    inventory: appData.user.inventory || [],
+                    activities: []
+                };
+                appData.users.push(user);
+            } else {
+                user.name = appData.user.name;
+                user.balance = appData.user.balance;
+                user.tickets = appData.user.tickets;
+                user.bonusDays = appData.user.bonusDays;
+                user.lastActive = new Date().toISOString();
+                user.usedPromos = appData.user.usedPromos;
+                user.inventory = appData.user.inventory || user.inventory;
+            }
         }
 
         // Показать админ интерфейс
@@ -958,6 +1038,7 @@ if (tg) {
 
         // Обновление статистики админки
         function updateAdminStats() {
+            syncCurrentUserToUsers();
             const today = new Date().toDateString();
             const activeToday = appData.users.filter(u => 
                 u.lastActive && new Date(u.lastActive).toDateString() === today
@@ -1150,6 +1231,7 @@ if (tg) {
             const data = {
                 users: appData.users,
                 promos: appData.promos,
+                withdrawals: appData.withdrawals,
                 statistics: {
                     totalUsers: appData.users.length,
                     totalBalance: appData.users.reduce((sum, u) => sum + (u.balance || 0), 0),
@@ -1201,6 +1283,19 @@ if (tg) {
 
         function openShop() {
             openModal('shopModal');
+        }
+
+        function openExchangeModal() {
+            updateExchangeResult();
+            openModal('exchangeModal');
+        }
+
+        function openWithdrawModal() {
+            const el = document.getElementById('withdrawStatusText');
+            if (el) {
+                el.textContent = appData.settings.withdrawalsEnabled ? 'Выводы включены' : 'Выводы отключены';
+            }
+            openModal('withdrawModal');
         }
 
         // Хранилище предметов
@@ -1303,6 +1398,7 @@ if (tg) {
                 showNotification(`🎉 Ежедневный бонус!\nВы получили ${reward} монет!`, 'success');
             }
             
+            syncCurrentUserToUsers();
             saveData();
             updateUI();
             generateBonusCalendar();
@@ -1340,6 +1436,19 @@ if (tg) {
                 saveData();
             }
 
+            // Показ промокода по одобренному выводу при входе
+            if (appData.user.id && Array.isArray(appData.withdrawals)) {
+                const pendingNotifies = appData.withdrawals.filter(w => w.userId === appData.user.id && w.status === 'approved' && !w.notified);
+                if (pendingNotifies.length > 0) {
+                    const last = pendingNotifies[pendingNotifies.length - 1];
+                    if (last.promoCode) {
+                        showNotification(`✅ Ваш вывод одобрен!\nПромокод: ${last.promoCode}`, 'success');
+                        last.notified = true;
+                        saveData();
+                    }
+                }
+            }
+
             // Автоматическое обновление лидерборда
             setInterval(() => {
                 if (document.getElementById('leaderboardModal').style.display === 'flex') {
@@ -1375,6 +1484,8 @@ if (tg) {
 
         // Генерация лидерборда в реальном времени
         function generateLeaderboard() {
+            // Гарантируем актуальность данных текущего пользователя
+            syncCurrentUserToUsers();
             const leaderboardList = document.getElementById('leaderboardList');
             leaderboardList.innerHTML = '';
             
@@ -1487,6 +1598,7 @@ if (tg) {
                 alert('🎊 Поздравляем!\n\nВы нашли секретную пасхалку!\n\n+50 монет к балансу!');
                 appData.user.balance += 50;
                 appData.adminClicks = 0;
+                syncCurrentUserToUsers();
                 saveData();
                 updateUI();
                 logUserActivity('easter_egg');
@@ -1533,6 +1645,7 @@ if (tg) {
             appData.user.usedPromos.push(promoCode);
             promo.uses++;
             
+            syncCurrentUserToUsers();
             saveData();
             updateUI();
             closeModal('promoModal');
@@ -1540,6 +1653,142 @@ if (tg) {
             
             showNotification(`🎉 Промокод активирован!\nПолучено ${promo.reward} монет!`, 'success');
             document.getElementById('promoInput').value = '';
+        }
+
+        // Обмен рублей на билеты
+        function updateExchangeResult() {
+            const input = document.getElementById('exchangeAmountInput');
+            const res = document.getElementById('exchangeResult');
+            if (!input || !res) return;
+            const amount = parseInt(input.value || '0');
+            if (isNaN(amount) || amount <= 0) {
+                res.textContent = 'Вы получите: 0 билетов';
+                return;
+            }
+            const tickets = Math.floor(amount / 10) * 2;
+            res.textContent = `Вы получите: ${tickets} билетов`;
+        }
+
+        function performExchange() {
+            const input = document.getElementById('exchangeAmountInput');
+            const amount = parseInt(input.value || '0');
+            if (isNaN(amount) || amount < 100) {
+                showNotification('❌ Минимальная сумма обмена 100 ₽', 'error');
+                return;
+            }
+            if (amount % 10 !== 0) {
+                showNotification('❌ Сумма должна быть кратна 10 ₽', 'error');
+                return;
+            }
+            if (amount > appData.user.balance) {
+                showNotification('❌ Недостаточно средств для обмена', 'error');
+                return;
+            }
+            const tickets = (amount / 10) * 2;
+            appData.user.balance -= amount;
+            appData.user.tickets += tickets;
+            syncCurrentUserToUsers();
+            saveData();
+            updateUI();
+            closeModal('exchangeModal');
+            logUserActivity(`exchange_${amount}`);
+            showNotification(`✅ Обмен выполнен!\nСписано ${amount} ₽, получено ${tickets} билетов`, 'success');
+            input.value = '';
+            updateExchangeResult();
+        }
+
+        // Вывод билетов
+        function submitWithdrawalRequest() {
+            if (!appData.settings.withdrawalsEnabled) {
+                showNotification('❌ Выводы временно отключены', 'error');
+                return;
+            }
+            const nickname = document.getElementById('withdrawNicknameInput').value.trim();
+            const amount = parseInt(document.getElementById('withdrawTicketsInput').value || '0');
+            if (!nickname) {
+                showNotification('❌ Укажите ник', 'error');
+                return;
+            }
+            if (isNaN(amount) || amount < 50) {
+                showNotification('❌ Минимальный вывод 50 билетов', 'error');
+                return;
+            }
+            const request = {
+                id: 'wd_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
+                userId: appData.user.id,
+                userName: appData.user.name,
+                nickname: nickname,
+                tickets: amount,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                promoCode: null,
+                notified: false
+            };
+            appData.withdrawals.push(request);
+            saveData();
+            closeModal('withdrawModal');
+            logUserActivity('withdraw_request');
+            showNotification('✅ Заявка на вывод отправлена! Ожидайте одобрения', 'success');
+            document.getElementById('withdrawNicknameInput').value = '';
+            document.getElementById('withdrawTicketsInput').value = '';
+        }
+
+        // Админ: управление заявками на вывод
+        function showWithdrawRequests() {
+            if (!appData.user.isAdmin) return;
+            if (!appData.withdrawals || appData.withdrawals.length === 0) {
+                alert('💸 Заявок на вывод нет');
+                return;
+            }
+            const statusText = { pending: '⏳ Ожидание', approved: '✅ Одобрено', declined: '❌ Отклонено' };
+            let list = 'Заявки на вывод:\n\n';
+            appData.withdrawals.forEach((w, i) => {
+                list += `${i + 1}. ${w.userName} (${w.nickname}) — ${w.tickets} билетов — ${statusText[w.status]}\n`;
+                list += `   Дата: ${new Date(w.createdAt).toLocaleString()}${w.promoCode ? `\n   Промокод: ${w.promoCode}` : ''}\n\n`;
+            });
+            const idx = parseInt(prompt(list + 'Введите номер заявки для управления:')) - 1;
+            if (!(idx >= 0 && idx < appData.withdrawals.length)) return;
+            const req = appData.withdrawals[idx];
+            if (req.status === 'pending') {
+                const action = prompt(`Управление заявкой ${idx + 1}:\n\n1 - Одобрить (ввести промокод)\n2 - Отклонить\n0 - Отмена`);
+                if (action === '1') {
+                    const code = prompt('Введите промокод для пользователя:');
+                    if (!code) return;
+                    // Проверяем наличие билетов у пользователя на момент одобрения
+                    const user = appData.users.find(u => u.id === req.userId);
+                    const available = user ? (user.tickets || 0) : 0;
+                    if (available < req.tickets) {
+                        alert('❌ Недостаточно билетов у пользователя для списания');
+                        return;
+                    }
+                    // Списание билетов
+                    user.tickets = available - req.tickets;
+                    if (appData.user.id === req.userId) {
+                        appData.user.tickets = user.tickets;
+                        updateUI();
+                    }
+                    req.status = 'approved';
+                    req.promoCode = code;
+                    req.approvedAt = new Date().toISOString();
+                    req.notified = false;
+                    saveData();
+                    alert('✅ Заявка одобрена. Промокод будет показан пользователю при следующем входе');
+                } else if (action === '2') {
+                    req.status = 'declined';
+                    req.declinedAt = new Date().toISOString();
+                    saveData();
+                    alert('✅ Заявка отклонена');
+                }
+            } else {
+                alert(`Статус заявки: ${req.status.toUpperCase()}${req.promoCode ? `\nПромокод: ${req.promoCode}` : ''}`);
+            }
+        }
+
+        function toggleWithdrawals() {
+            if (!appData.user.isAdmin) return;
+            appData.settings.withdrawalsEnabled = !appData.settings.withdrawalsEnabled;
+            saveData();
+            alert(`🔌 Выводы теперь: ${appData.settings.withdrawalsEnabled ? 'включены' : 'отключены'}`);
         }
 
         // Система уведомлений
@@ -1831,15 +2080,7 @@ if (tg) {
         // Автосохранение каждые 30 секунд
         setInterval(() => {
             if (appData.user.id) {
-                const user = appData.users.find(u => u.id === appData.user.id);
-                if (user) {
-                    user.balance = appData.user.balance;
-                    user.tickets = appData.user.tickets;
-                    user.bonusDays = appData.user.bonusDays;
-                    user.usedPromos = appData.user.usedPromos;
-                    user.inventory = appData.user.inventory;
-                    user.lastActive = new Date().toISOString();
-                }
+                syncCurrentUserToUsers();
                 saveData();
             }
         }, 30000);
