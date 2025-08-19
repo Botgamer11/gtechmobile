@@ -922,6 +922,39 @@
             }
         };
 
+        // === Серверное хранилище (MySQL через PHP API) ===
+        const API_STATE_URL = 'api/state.php';
+
+        async function serverLoadAppState() {
+            try {
+                const response = await fetch(API_STATE_URL, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) return null;
+                const payload = await response.json();
+                if (payload && payload.ok && payload.data) {
+                    return payload.data;
+                }
+                return null;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        async function serverSaveAppState(state) {
+            try {
+                await fetch(API_STATE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(state)
+                });
+            } catch (err) {
+                // ignore network errors, localStorage acts as fallback
+            }
+        }
+
         // В начале скрипта, где инициализируется Telegram WebApp
 let tg = window.Telegram?.WebApp;
 if (tg) {
@@ -952,34 +985,47 @@ if (tg) {
     }
 }
 
-        // Загрузка данных из localStorage
-        function loadData() {
-            const saved = localStorage.getItem('miniAppData');
-            if (saved) {
-                const parsedData = JSON.parse(saved);
-                appData = { ...appData, ...parsedData };
-                // Обновляем новые поля по умолчанию для старых сохранений
-                if (!appData.settings) appData.settings = {};
-                if (!Array.isArray(appData.settings.adminIds)) {
-                    appData.settings.adminIds = [6595683709];
-                }
-                if (typeof appData.settings.withdrawalsEnabled === 'undefined') {
-                    appData.settings.withdrawalsEnabled = true;
-                }
-                if (!appData.settings.downloadLinks) appData.settings.downloadLinks = {};
-                appData.settings.downloadLinks.telegram = appData.settings.downloadLinks.telegram || 'https://t.me/gtechmobile';
-                appData.settings.downloadLinks.appgallery = appData.settings.downloadLinks.appgallery || 'https://appgallery.huawei.com';
-                appData.settings.downloadLinks.rustore = appData.settings.downloadLinks.rustore || 'https://discord.com';
-                if (!Array.isArray(appData.withdrawals)) appData.withdrawals = [];
-                updateUI();
+        // Загрузка данных из БД (через API) с fallback на localStorage
+        async function loadData() {
+            let loadedFromServer = false;
+            const serverState = await serverLoadAppState();
+            if (serverState) {
+                appData = { ...appData, ...serverState };
+                loadedFromServer = true;
             }
+
+            if (!loadedFromServer) {
+                const saved = localStorage.getItem('miniAppData');
+                if (saved) {
+                    const parsedData = JSON.parse(saved);
+                    appData = { ...appData, ...parsedData };
+                }
+            }
+
+            // Обновляем новые поля по умолчанию для старых сохранений
+            if (!appData.settings) appData.settings = {};
+            if (!Array.isArray(appData.settings.adminIds)) {
+                appData.settings.adminIds = [6595683709];
+            }
+            if (typeof appData.settings.withdrawalsEnabled === 'undefined') {
+                appData.settings.withdrawalsEnabled = true;
+            }
+            if (!appData.settings.downloadLinks) appData.settings.downloadLinks = {};
+            appData.settings.downloadLinks.telegram = appData.settings.downloadLinks.telegram || 'https://t.me/gtechmobile';
+            appData.settings.downloadLinks.appgallery = appData.settings.downloadLinks.appgallery || 'https://appgallery.huawei.com';
+            appData.settings.downloadLinks.rustore = appData.settings.downloadLinks.rustore || 'https://discord.com';
+            if (!Array.isArray(appData.withdrawals)) appData.withdrawals = [];
+            updateUI();
+
             generateBonusCalendar();
             generateLeaderboard();
         }
 
-        // Сохранение данных в localStorage
+        // Сохранение данных в MySQL через API (сохранение в localStorage как резерв)
         function saveData() {
             localStorage.setItem('miniAppData', JSON.stringify(appData));
+            // Отправляем на сервер асинхронно, без блокировки UI
+            serverSaveAppState(appData);
         }
 
         // Обновление UI
@@ -1462,8 +1508,8 @@ if (tg) {
         }
 
         // Улучшенная инициализация приложения
-        window.addEventListener('load', () => {
-            loadData();
+        window.addEventListener('load', async () => {
+            await loadData();
             // Актуализируем статус админа после загрузки сохранённых данных
             if (appData.user && appData.user.id) {
                 const isAdminNow = Array.isArray(appData.settings.adminIds) && appData.settings.adminIds.includes(appData.user.id);
