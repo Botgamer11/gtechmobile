@@ -769,6 +769,7 @@
             <button class="admin-btn" onclick="showPromoManagement()">🎫 Управление промокодами</button>
             <button class="admin-btn" onclick="manageLeaderboard()">🏆 Управление лидербордом</button>
             <button class="admin-btn" onclick="showLinkManagement()">🔗 Управление ссылками</button>
+            <button class="admin-btn" onclick="manageAdmins()">👑 Управление администраторами</button>
             <button class="admin-btn" onclick="showWithdrawRequests()">💸 Запросы выводов</button>
             <button class="admin-btn" onclick="toggleWithdrawals()">🔌 Переключить выводы</button>
             <button class="admin-btn" onclick="exportData()">📊 Экспорт данных</button>
@@ -1223,6 +1224,44 @@ if (tg) {
                 appData.settings.downloadLinks[linkType] = newLink;
                 saveData();
                 alert('✅ Ссылка обновлена');
+            }
+        }
+
+        // Управление администраторами
+        function manageAdmins() {
+            if (!appData.user.isAdmin) return;
+            const current = appData.settings.adminIds || [];
+            let message = '👑 ТЕКУЩИЕ АДМИНИСТРАТОРЫ (ID):\n\n';
+            if (current.length === 0) {
+                message += 'нет\n\n';
+            } else {
+                current.forEach((id, idx) => {
+                    message += `${idx + 1}. ${id}\n`;
+                });
+                message += '\n';
+            }
+            message += '1 - Добавить администратора по ID\n2 - Удалить администратора по номеру из списка\n0 - Отмена';
+            const action = prompt(message);
+            if (action === '1') {
+                const idStr = prompt('Введите Telegram ID пользователя, которого нужно сделать администратором:');
+                const id = parseInt(idStr || '');
+                if (!id || isNaN(id)) return alert('❌ Неверный ID');
+                if (!appData.settings.adminIds.includes(id)) {
+                    appData.settings.adminIds.push(id);
+                    saveData();
+                    alert(`✅ Пользователь ${id} добавлен в администраторы`);
+                } else {
+                    alert('ℹ️ Этот пользователь уже администратор');
+                }
+            } else if (action === '2') {
+                if (!current.length) return alert('❌ Список администраторов пуст');
+                const idx = parseInt(prompt('Введите номер администратора из списка для удаления:')) - 1;
+                if (idx >= 0 && idx < current.length) {
+                    const removed = current[idx];
+                    appData.settings.adminIds = current.filter((_, i) => i !== idx);
+                    saveData();
+                    alert(`✅ Администратор ${removed} удален`);
+                }
             }
         }
 
@@ -1713,6 +1752,12 @@ if (tg) {
                 showNotification('❌ Минимальный вывод 50 билетов', 'error');
                 return;
             }
+            // Проверка на достаточность билетов у пользователя
+            const availableTickets = appData.user.tickets || 0;
+            if (amount > availableTickets) {
+                showNotification(`❌ Недостаточно билетов для вывода. У вас осталось: ${availableTickets}`, 'error');
+                return;
+            }
             const request = {
                 id: 'wd_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                 userId: appData.user.id,
@@ -1758,7 +1803,7 @@ if (tg) {
                     const user = appData.users.find(u => u.id === req.userId);
                     const available = user ? (user.tickets || 0) : 0;
                     if (available < req.tickets) {
-                        alert('❌ Недостаточно билетов у пользователя для списания');
+                        alert(`❌ Недостаточно билетов у пользователя для списания. Осталось: ${available}`);
                         return;
                     }
                     // Списание билетов
@@ -1767,17 +1812,18 @@ if (tg) {
                         appData.user.tickets = user.tickets;
                         updateUI();
                     }
-                    req.status = 'approved';
-                    req.promoCode = code;
-                    req.approvedAt = new Date().toISOString();
-                    req.notified = false;
+                    // Одобряем и удаляем из списка заявок (не сохраняем обработанные)
+                    const approvedInfo = { promoCode: code };
+                    // Уведомление пользователю при следующем входе больше не нужно через заявки,
+                    // поэтому сразу показываем инфо администратору
+                    appData.withdrawals.splice(idx, 1);
                     saveData();
-                    alert('✅ Заявка одобрена. Промокод будет показан пользователю при следующем входе');
+                    alert(`✅ Заявка одобрена. Промокод: ${approvedInfo.promoCode}`);
                 } else if (action === '2') {
-                    req.status = 'declined';
-                    req.declinedAt = new Date().toISOString();
+                    // Отклоняем и удаляем из списка заявок (не сохраняем обработанные)
+                    appData.withdrawals.splice(idx, 1);
                     saveData();
-                    alert('✅ Заявка отклонена');
+                    alert('✅ Заявка отклонена и удалена из списка');
                 }
             } else {
                 alert(`Статус заявки: ${req.status.toUpperCase()}${req.promoCode ? `\nПромокод: ${req.promoCode}` : ''}`);
