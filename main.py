@@ -42,7 +42,8 @@ FILES = [
     'database.json',
     'unity.json',
     'tech.json',
-    'profiles.json'
+    'profiles.json',
+    'invites.json'
 ]
 
 
@@ -305,6 +306,41 @@ unity_save = (lambda: CJSON.write(unity, FILES[1]))
 
 profiles = CJSON.read(FILES[3])
 profiles_save = (lambda: CJSON.write(profiles, FILES[3]))
+
+class Invites:
+    def __init__(self):
+        self.data = CJSON.read('invites.json')
+        self.save = (lambda: CJSON.write(self.data, 'invites.json'))
+        
+        if len(self.data) <= 0:
+            self.data["invites"] = {}
+            self.save()
+    
+    def add_invite(self, chat_id, user_id, inviter_id):
+        if str(chat_id) not in self.data["invites"]:
+            self.data["invites"][str(chat_id)] = {}
+        
+        self.data["invites"][str(chat_id)][str(user_id)] = {
+            "inviter_id": str(inviter_id),
+            "invite_date": datetime.now().isoformat()
+        }
+        self.save()
+    
+    def get_invite_info(self, chat_id, user_id):
+        if (str(chat_id) in self.data["invites"] and 
+            str(user_id) in self.data["invites"][str(chat_id)]):
+            return self.data["invites"][str(chat_id)][str(user_id)]
+        return None
+    
+    def remove_invite(self, chat_id, user_id):
+        if (str(chat_id) in self.data["invites"] and 
+            str(user_id) in self.data["invites"][str(chat_id)]):
+            del self.data["invites"][str(chat_id)][str(user_id)]
+            self.save()
+            return True
+        return False
+
+invites_db = Invites()
 
 async def send_message(peer_id = None, text = None, keyboard = None, attachment = None):
     try:
@@ -931,6 +967,10 @@ async def handle_new_message(event: dict):
                 DB.save(database)
                 await bot.api.messages.send(peer_id=chat_id, message="Для начала работы выдай мне права администратора и пропиши /start.", random_id=0)
             else:
+                # Записываем информацию о приглашении
+                inviter_id = message.get("from_id")
+                if inviter_id and inviter_id > 0:
+                    invites_db.add_invite(chat_id, user_id, inviter_id)
                 if str(user_id) in database[str(chat_id)]['bans']:
                     end_time = datetime.fromisoformat(database[str(chat_id)]['bans'][str(user_id)]['end_time'])
                     if end_time > datetime.now():
@@ -1349,6 +1389,9 @@ async def kick_handler(message: Message, mention: str = None):
             if str(user_id) in database[str(chat_id)]['roles']:
                 del database[str(chat_id)]['roles'][str(user_id)]
                 DB.save(database)
+            
+            # Удаляем информацию о приглашении
+            invites_db.remove_invite(chat_id, user_id)
             
             await message.answer(f"❌ Пользователь {get_full_name(user)} был исключен из чата.\n\nНик и роль пользователя удалены.")
         except Exception as e:
@@ -3341,6 +3384,14 @@ async def profile_message(message: Message):
     # Получаем роль
     role = get_user_role(chat_id, target_user_id)
     
+    # Получаем информацию о приглашении
+    invite_info = invites_db.get_invite_info(chat_id, target_user_id)
+    invite_text = ""
+    if invite_info:
+        inviter = await get_user_info(invite_info["inviter_id"])
+        invite_date = datetime.fromisoformat(invite_info["invite_date"]).strftime('%Y-%m-%d %H:%M')
+        invite_text = f"📨 Приглашен: {invite_date}\n👤 Кем: {get_full_name(inviter) if inviter else 'Неизвестно'}\n"
+
     # Проверяем бан
     is_banned = str(target_user_id) in database.get(str(chat_id), {}).get('bans', {})
     ban_info = ""
@@ -3354,6 +3405,10 @@ async def profile_message(message: Message):
     if is_muted:
         mute_end = datetime.fromisoformat(database[str(chat_id)]['mutes'][str(target_user_id)]['end_time'])
         mute_info = f"🔇 Замучен до {mute_end.strftime('%Y-%m-%d %H:%M')}\n"
+
+    # Проверяем выговоры
+    warns = database.get(str(chat_id), {}).get('warns', {}).get(str(target_user_id), [])
+    warnings_info = f"⚠️ Выговоров: {len(warns)}\n"
 
     # Проверяем репорты
     reports_count = len(tech_db.get_user_reports(target_user_id))
@@ -3375,7 +3430,9 @@ async def profile_message(message: Message):
         f"🏷 Ник: {nickname}\n"
         f"👑 Роль: {role}\n"
         f"💰 Баланс: {profiles[str(target_user_id)]['stats']['balance']} руб.\n"
-        f"🌟 VIP: {profiles[str(target_user_id)]['stats']['vip']}\n\n"
+        f"🌟 VIP: {profiles[str(target_user_id)]['stats']['vip']}\n"
+        f"{invite_text}"
+        f"{warnings_info}\n"
         f"{ban_info}"
         f"{mute_info}"
         f"{reports_info}"
