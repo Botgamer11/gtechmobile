@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Админ панель и Топ — JSON DB</title>
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #121821;
+        --panel-2: #0f141c;
+        --txt: #e7eef7;
+        --muted: #9bb0c3;
+        --accent: #5ec2ff;
+        --accent-2: #7ee787;
+        --warn: #faae2b;
+        --danger: #ff7b72;
+        --ok: #2ea043;
+        --border: #1e2632;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--txt);
+        background: radial-gradient(1200px 800px at 10% 0%, #0f1722 0%, var(--bg) 55%);
+      }
+      header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+        position: sticky; top: 0; z-index: 1;
+      }
+      header h1 { margin: 0; font-size: 18px; }
+      header .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+      .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+      .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
+      @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+      .card {
+        background: linear-gradient(180deg, var(--panel), var(--panel-2));
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      }
+      .card h2 { margin: 0 0 12px; font-size: 16px; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      label { font-size: 12px; color: var(--muted); }
+      input[type="text"], input[type="number"], select {
+        background: #0d131b;
+        color: var(--txt);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        outline: none;
+        min-width: 0;
+      }
+      input[type="checkbox"] { transform: translateY(1px); }
+      .btn {
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #182234, #121a29);
+        color: var(--txt);
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .btn:hover { filter: brightness(1.05); }
+      .btn:active { transform: translateY(1px); }
+      .btn.primary { border-color: #123a57; background: linear-gradient(180deg, #0e6aa6, #0f3955); }
+      .btn.success { border-color: #1a4225; background: linear-gradient(180deg, #2c8a42, #1b4c2a); }
+      .btn.warn { border-color: #5b3e11; background: linear-gradient(180deg, #a3711e, #5e3c0e); }
+      .btn.danger { border-color: #5a2321; background: linear-gradient(180deg, #a53b35, #5f2623); }
+      .hint { color: var(--muted); font-size: 12px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+      th { color: var(--muted); font-weight: 600; }
+      .pill { display: inline-block; font-size: 12px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); }
+      .pill.ok { color: var(--accent-2); border-color: #294f33; background: #0d1a12; }
+      .pill.warn { color: var(--warn); border-color: #5b3e11; background: #1a1208; }
+      .pill.bad { color: var(--danger); border-color: #5a2321; background: #1a0c0b; }
+      .muted { color: var(--muted); }
+      .right { text-align: right; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+      footer { color: var(--muted); font-size: 12px; padding: 14px 20px; }
+      .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: #0d131b; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Админ панель и Топ — JSON DB</h1>
+      <div class="sub">
+        Режим БД: <span id="db-mode" class="pill"></span>
+        <span class="muted">•</span>
+        Состояние: <span id="db-state" class="pill"></span>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="grid">
+        <section class="card">
+          <h2>Начисления</h2>
+          <div class="row" style="gap:12px; margin-bottom: 10px;">
+            <div>
+              <label>ID пользователя</label>
+              <div><input id="user-id" type="text" placeholder="например, 123456" class="mono" /></div>
+            </div>
+            <div>
+              <label>Ник (опционально)</label>
+              <div><input id="user-username" type="text" placeholder="@nickname" /></div>
+            </div>
+            <div>
+              <label>Имя (опционально)</label>
+              <div><input id="user-firstname" type="text" placeholder="Имя" /></div>
+            </div>
+            <div>
+              <label>Фамилия (опционально)</label>
+              <div><input id="user-lastname" type="text" placeholder="Фамилия" /></div>
+            </div>
+          </div>
+          <div class="row" style="gap:12px; align-items: flex-end; flex-wrap: wrap;">
+            <div>
+              <label>Сумма (рубли)</label>
+              <div><input id="amount" type="number" step="1" value="100" class="mono" /></div>
+            </div>
+            <div>
+              <label>Источник</label>
+              <div><input id="source" type="text" value="welcome_bonus" /></div>
+            </div>
+            <div>
+              <button id="btn-award" class="btn success">Начислить</button>
+              <button id="btn-withdraw" class="btn danger">Списать</button>
+            </div>
+          </div>
+          <div class="hint" style="margin-top: 10px;">Операция атомарно сохранится в JSON БД и обновит баланс. При первом запуске БД создаётся автоматически.</div>
+        </section>
+
+        <section class="card">
+          <h2>Пользователь</h2>
+          <div class="row" style="gap:12px; align-items:center;">
+            <button id="btn-load-user" class="btn">Обновить данные</button>
+            <span class="hint">Покажет баланс и флаги</span>
+          </div>
+          <div id="user-info" class="hint" style="margin-top:10px; white-space: pre-wrap;"></div>
+          <div class="row" style="gap:12px; margin-top: 14px;">
+            <label><input type="checkbox" id="flag-visible" checked /> Показывать в топе</label>
+            <label><input type="checkbox" id="flag-banned" /> Заблокирован</label>
+            <button id="btn-save-flags" class="btn primary">Сохранить флаги</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid" style="margin-top: 18px;">
+        <section class="card">
+          <h2>Топ по балансу</h2>
+          <div class="row" style="gap:10px; margin-bottom: 8px;">
+            <button id="btn-refresh-top" class="btn">Обновить</button>
+            <span class="hint">Показывает топ-100 видимых пользователей</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ID</th>
+                <th>Ник</th>
+                <th class="right">Баланс</th>
+                <th>Статус</th>
+                <th>Обновлён</th>
+              </tr>
+            </thead>
+            <tbody id="top-body"></tbody>
+          </table>
+        </section>
+
+        <section class="card">
+          <h2>Админ: начисления по дням</h2>
+          <div class="row" style="gap:10px; margin-bottom: 8px;">
+            <button id="btn-refresh-admin" class="btn">Обновить</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>День</th>
+                <th class="right">Сумма</th>
+                <th class="right">Операций</th>
+              </tr>
+            </thead>
+            <tbody id="admin-body"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top: 18px;">
+        <h2>Настройка БД</h2>
+        <p class="hint">По умолчанию используется локальная JSON БД в <span class="kbd">localStorage</span> (подходит для тестов). Для облачной JSON БД можно подключить Firebase Realtime Database, указав конфиг ниже.</p>
+        <details>
+          <summary>Показать/скрыть конфиг</summary>
+          <pre class="hint" style="white-space: pre-wrap;">window.DB_MODE = 'local'; // или 'firebase'
+window.FIREBASE_CONFIG = {
+  apiKey: '...',
+  authDomain: '...',
+  databaseURL: 'https://<project>.firebaseio.com',
+  projectId: '...',
+  appId: '...'
+};</pre>
+        </details>
+      </section>
+    </div>
+
+    <footer class="container">
+      Сделано для JSON-хранилища (auto-create). В проде используйте Firebase Realtime Database.
+    </footer>
+
+    <script>
+      // Конфигурация по умолчанию. Поменяйте при необходимости перед деплоем.
+      window.DB_MODE = window.DB_MODE || 'local'; // 'local' | 'firebase'
+      window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || null; // заполните чтобы использовать Firebase
+
+      // Утилиты
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+      const nowIso = () => new Date().toISOString();
+      const toDate = (iso) => iso ? new Date(iso) : null;
+      const formatDate = (iso) => {
+        const d = toDate(iso);
+        if (!d) return '';
+        return d.toLocaleString();
+      };
+      const clone = (obj) => JSON.parse(JSON.stringify(obj));
+
+      const DEFAULT_DB = Object.freeze({ users: {}, transactions: {} });
+
+      // Базовый API бизнес-логики, поверх конкретного провайдера
+      function createDomainApi(provider) {
+        return {
+          ensureReady: () => provider.ensureReady(),
+          async getUser(userId) {
+            const id = String(userId);
+            const db = await provider.read();
+            return db.users[id] || null;
+          },
+          async upsertUser(user) {
+            const id = String(user.user_id);
+            const db = await provider.read();
+            const current = db.users[id] || {
+              user_id: id,
+              username: null,
+              first_name: null,
+              last_name: null,
+              is_banned: false,
+              is_visible_in_top: true,
+              balance: 0,
+              created_at: nowIso(),
+              updated_at: nowIso(),
+            };
+            const next = {
+              ...current,
+              ...user,
+              user_id: id,
+              updated_at: nowIso(),
+            };
+            db.users[id] = next;
+            await provider.write(db);
+            return next;
+          },
+          async setUserFlags(userId, { is_visible_in_top, is_banned }) {
+            const id = String(userId);
+            const db = await provider.read();
+            if (!db.users[id]) return null;
+            if (typeof is_visible_in_top === 'boolean') db.users[id].is_visible_in_top = is_visible_in_top;
+            if (typeof is_banned === 'boolean') db.users[id].is_banned = is_banned;
+            db.users[id].updated_at = nowIso();
+            await provider.write(db);
+            return db.users[id];
+          },
+          async awardRubles(userId, delta, source, meta) {
+            const id = String(userId);
+            return provider.transact(async (db) => {
+              // Создаём пользователя при необходимости
+              if (!db.users[id]) {
+                db.users[id] = {
+                  user_id: id,
+                  username: null,
+                  first_name: null,
+                  last_name: null,
+                  is_banned: false,
+                  is_visible_in_top: true,
+                  balance: 0,
+                  created_at: nowIso(),
+                  updated_at: nowIso(),
+                };
+              }
+
+              db.users[id].balance = (db.users[id].balance || 0) + Number(delta);
+              db.users[id].updated_at = nowIso();
+
+              const txId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+              db.transactions[txId] = {
+                id: txId,
+                user_id: id,
+                amount: Number(delta),
+                source: String(source || 'unknown'),
+                meta: meta || {},
+                created_at: nowIso(),
+              };
+              return { user_id: id, balance: db.users[id].balance, awarded: Number(delta) };
+            });
+          },
+          async getLeaderboardTop(limit = 100) {
+            const db = await provider.read();
+            const arr = Object.values(db.users);
+            return arr
+              .filter(u => !u.is_banned && u.is_visible_in_top)
+              .sort((a, b) => b.balance - a.balance || new Date(b.updated_at) - new Date(a.updated_at))
+              .slice(0, limit);
+          },
+          async getAdminDailyEarnings() {
+            const db = await provider.read();
+            const byDay = new Map();
+            for (const tx of Object.values(db.transactions)) {
+              const day = new Date(tx.created_at);
+              // yyyy-mm-dd
+              const key = `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+              const agg = byDay.get(key) || { day: key, total_amount: 0, operations: 0 };
+              agg.total_amount += Number(tx.amount) || 0;
+              agg.operations += 1;
+              byDay.set(key, agg);
+            }
+            return Array.from(byDay.values()).sort((a, b) => (a.day < b.day ? 1 : -1));
+          },
+        };
+      }
+
+      // Провайдер: локальный localStorage JSON
+      function createLocalProvider(storageKey = 'json_db_v1') {
+        async function read() {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) return clone(DEFAULT_DB);
+          try { return JSON.parse(raw); } catch { return clone(DEFAULT_DB); }
+        }
+        async function write(db) {
+          localStorage.setItem(storageKey, JSON.stringify(db));
+        }
+        async function ensureReady() {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) {
+            localStorage.setItem(storageKey, JSON.stringify(DEFAULT_DB));
+            return { created: true };
+          }
+          return { created: false };
+        }
+        async function transact(mutator) {
+          // На локалсторидже симулируем транзакцию
+          for (let i = 0; i < 3; i++) {
+            const db = await read();
+            const result = await mutator(db);
+            await write(db);
+            return result;
+          }
+        }
+        return { read, write, ensureReady, transact };
+      }
+
+      // Провайдер: Firebase Realtime Database (опционально)
+      function createFirebaseProvider(config, rootPath = 'app') {
+        let app = null;
+        let rtdb = null;
+        async function ensureSdk() {
+          if (window.firebase?.apps) return;
+          await loadScript('https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js');
+          await loadScript('https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js');
+        }
+        async function init() {
+          await ensureSdk();
+          if (!app) {
+            app = firebase.initializeApp(config);
+            rtdb = firebase.database();
+          }
+        }
+        function rootRef() { return rtdb.ref(rootPath); }
+        async function read() {
+          await init();
+          const snap = await rootRef().get();
+          if (!snap.exists()) return clone(DEFAULT_DB);
+          const val = snap.val();
+          return { users: val.users || {}, transactions: val.transactions || {} };
+        }
+        async function write(db) {
+          await init();
+          await rootRef().set(db);
+        }
+        async function ensureReady() {
+          await init();
+          const snap = await rootRef().get();
+          if (!snap.exists()) {
+            await rootRef().set(DEFAULT_DB);
+            return { created: true };
+          }
+          return { created: false };
+        }
+        async function transact(mutator) {
+          await init();
+          // Используем транзакцию по всему корню. Это безопасно, но может быть шумно.
+          const result = await rootRef().transaction(current => {
+            const db = current || clone(DEFAULT_DB);
+            const draft = clone(db);
+            // Выполняем мутацию синхронно
+            const r = mutatorSync(draft);
+            return draft;
+
+            function mutatorSync(d) {
+              let out = null;
+              // Оборачиваем пользовательский async в sync через грубый трюк: не поддерживаем async внутри
+              // Для RealtimeDB используем чистую синхронную мутацию в вызывающем коде
+              out = mutator(d);
+              // Если вернулся промис, это ошибка проектирования. Возвращаем как есть.
+              return out;
+            }
+          }, (error, committed, snapshot) => {
+            // callback required by SDK, no-op here
+          }, false);
+
+          // Второй раз читаем, чтобы получить актуальные данные и синтезировать ответ
+          const latest = (await rootRef().get()).val() || clone(DEFAULT_DB);
+          // Увы, RealtimeDB transaction не возвращает значение, сгенерированное внутри mutator.
+          // Возвращаем null; вызывающий код должен быть готов к этому и перечитать данные при необходимости.
+          return null;
+        }
+        return { read, write, ensureReady, transact };
+      }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = src;
+          s.async = true;
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('Failed to load ' + src));
+          document.head.appendChild(s);
+        });
+      }
+
+      // Инициализация выбранного провайдера
+      const provider = (function() {
+        if (window.DB_MODE === 'firebase' && window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.databaseURL) {
+          return createFirebaseProvider(window.FIREBASE_CONFIG, 'jsondb');
+        }
+        return createLocalProvider('json_db_v1');
+      })();
+      const api = createDomainApi(provider);
+
+      // Вспомогательные функции UI
+      function setPill(el, text, type) {
+        el.textContent = text;
+        el.className = 'pill ' + (type || '');
+      }
+      function getEl(id) { return document.getElementById(id); }
+      function readInput(id) { return getEl(id).value.trim(); }
+
+      async function refreshTop() {
+        const rows = await api.getLeaderboardTop(100);
+        const tbody = getEl('top-body');
+        tbody.innerHTML = '';
+        rows.forEach((u, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="mono">${idx + 1}</td>
+            <td class="mono">${u.user_id}</td>
+            <td>${u.username ? `<span class="mono">${u.username}</span>` : '<span class="muted">—</span>'}</td>
+            <td class="right mono">${u.balance}</td>
+            <td>${u.is_banned ? '<span class="pill bad">Бан</span>' : (u.is_visible_in_top ? '<span class="pill ok">OK</span>' : '<span class="pill warn">Скрыт</span>')}</td>
+            <td class="muted">${formatDate(u.updated_at)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function refreshAdmin() {
+        const rows = await api.getAdminDailyEarnings();
+        const tbody = getEl('admin-body');
+        tbody.innerHTML = '';
+        rows.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="mono">${r.day}</td>
+            <td class="right mono">${r.total_amount}</td>
+            <td class="right mono">${r.operations}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function loadUserPanel() {
+        const userId = readInput('user-id');
+        if (!userId) { getEl('user-info').textContent = 'Укажите ID пользователя'; return; }
+        const u = await api.getUser(userId);
+        if (!u) { getEl('user-info').textContent = 'Пользователь не найден (будет создан при начислении)'; return; }
+        getEl('user-info').textContent = JSON.stringify(u, null, 2);
+        getEl('flag-visible').checked = !!u.is_visible_in_top;
+        getEl('flag-banned').checked = !!u.is_banned;
+      }
+
+      async function saveFlags() {
+        const userId = readInput('user-id');
+        if (!userId) return alert('Укажите ID пользователя');
+        const is_visible_in_top = getEl('flag-visible').checked;
+        const is_banned = getEl('flag-banned').checked;
+        await api.setUserFlags(userId, { is_visible_in_top, is_banned });
+        await loadUserPanel();
+        await refreshTop();
+      }
+
+      async function doAward(sign) {
+        const userId = readInput('user-id');
+        if (!userId) return alert('Укажите ID пользователя');
+        const amountRaw = readInput('amount');
+        const amount = Number(amountRaw || '0');
+        if (!Number.isFinite(amount) || amount <= 0) return alert('Сумма должна быть положительным числом');
+        const delta = sign * amount;
+        const source = readInput('source') || 'manual';
+
+        // Опционально обновляем профиль пользователя, если введены поля
+        const username = readInput('user-username') || null;
+        const first_name = readInput('user-firstname') || null;
+        const last_name = readInput('user-lastname') || null;
+        if (username || first_name || last_name) {
+          await api.upsertUser({ user_id: userId, username, first_name, last_name });
+        }
+
+        const res = await api.awardRubles(userId, delta, source, {});
+        await loadUserPanel();
+        await refreshTop();
+      }
+
+      async function boot() {
+        const mode = (window.DB_MODE === 'firebase' && window.FIREBASE_CONFIG) ? 'Firebase Realtime DB' : 'Local JSON (localStorage)';
+        setPill(getEl('db-mode'), mode, 'ok');
+        try {
+          const { created } = await api.ensureReady();
+          setPill(getEl('db-state'), created ? 'Создана' : 'Готово', created ? 'warn' : 'ok');
+        } catch (e) {
+          console.error(e);
+          setPill(getEl('db-state'), 'Ошибка', 'bad');
+        }
+        await refreshTop();
+        await refreshAdmin();
+      }
+
+      // События UI
+      getEl('btn-refresh-top').addEventListener('click', refreshTop);
+      getEl('btn-refresh-admin').addEventListener('click', refreshAdmin);
+      getEl('btn-load-user').addEventListener('click', loadUserPanel);
+      getEl('btn-save-flags').addEventListener('click', saveFlags);
+      getEl('btn-award').addEventListener('click', () => doAward(+1));
+      getEl('btn-withdraw').addEventListener('click', () => doAward(-1));
+
+      boot();
+    </script>
+  </body>
+  </html>
+
