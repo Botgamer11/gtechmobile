@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система Активностей</title>
+    <style>
+        :root {
+            --bg: #0f1722;
+            --panel: #141c27;
+            --accent: #e74c3c;
+            --accent2: #f39c12;
+            --text: #e5eef7;
+            --muted: #99a7bb;
+            --green: #2ecc71;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial;
+            background: radial-gradient(1000px 600px at 50% -200px, rgba(243,156,18,0.15), transparent 60%), var(--bg);
+            color: var(--text);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header-btn {
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            border: 0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .admin-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            box-shadow: 0 8px 24px rgba(231, 76, 60, 0.35);
+            cursor: pointer;
+        }
+
+        .container { padding: 16px; }
+        .user-info { display: grid; gap: 10px; }
+        .user-name { font-weight: 800; font-size: 16px; letter-spacing: 0.4px; color: #dfe8f2; }
+        .balance-section { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .balance-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 14px; }
+        .coin-icon, .ticket-icon { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 8px; }
+        .balance-value { color: var(--accent2); font-weight: 800; }
+
+        .grid-section { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+        .grid-item { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: transform .15s ease; }
+        .grid-item:hover { transform: translateY(-2px); }
+        .grid-icon { font-size: 28px; }
+        .grid-title { margin-top: 6px; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: 0.3px; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 16px; }
+        .modal-content { background: var(--panel); border-radius: 16px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .modal-title { font-weight: 800; letter-spacing: 0.4px; }
+        .close-btn { background: transparent; border: 0; color: var(--text); font-size: 18px; cursor: pointer; }
+        .modal-body { padding: 14px 16px; }
+
+        .promo-form { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .promo-input { background: rgba(255,255,255,0.06); border: 0; border-radius: 10px; padding: 10px 12px; color: var(--text); outline: none; }
+        .promo-submit { background: linear-gradient(45deg, #f39c12, #f1c40f); color: #2d1b00; font-weight: 800; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+
+        /* Admin panel */
+        .admin-panel { display: none; position: fixed; right: 16px; bottom: 16px; left: 16px; background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); color: #fff; border-radius: 16px; padding: 16px; z-index: 20; }
+        .admin-panel.show { display: block; }
+        .admin-title { font-weight: 900; margin-bottom: 10px; }
+        .detailed-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .stat-row { display: flex; justify-content: space-between; background: rgba(255,255,255,0.12); padding: 8px 10px; border-radius: 10px; }
+        .admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .admin-btn { background: rgba(255,255,255,0.2); border: 0; color: #fff; border-radius: 10px; padding: 10px; cursor: pointer; }
+
+        @media (max-width: 420px) {
+            .grid-section { grid-template-columns: 1fr; }
+            .detailed-stats { grid-template-columns: 1fr; }
+            .admin-actions { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script>
+        let appData = {
+            user: {
+                id: null,
+                name: 'ГОСТЬ',
+                balance: 0,
+                tickets: 0
+            },
+            users: [],
+            settings: {
+                adminIds: []
+            },
+            statistics: {
+                totalUsers: 0,
+                totalBalance: 0,
+                activeToday: 0
+            }
+        };
+
+        function saveData() {
+            localStorage.setItem('miniAppData', JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('miniAppData');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch (_) {}
+            }
+            if (!appData.user || !appData.user.id) {
+                appData.user = appData.user || {};
+                appData.user.id = Date.now();
+                appData.user.name = appData.user.name || 'ГОСТЬ';
+                appData.user.balance = appData.user.balance || 0;
+                appData.user.tickets = appData.user.tickets || 0;
+            }
+            if (!Array.isArray(appData.users)) appData.users = [];
+            if (!appData.users.find(u => u.id === appData.user.id)) {
+                appData.users.push({
+                    id: appData.user.id,
+                    name: appData.user.name,
+                    balance: appData.user.balance,
+                    tickets: appData.user.tickets,
+                    lastActive: new Date().toISOString()
+                });
+            }
+            saveData();
+        }
+
+        function updateUI() {
+            document.getElementById('userName').textContent = appData.user.name;
+            document.getElementById('balance').textContent = appData.user.balance;
+            document.getElementById('tickets').textContent = appData.user.tickets;
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function showNotification(message) { alert(message); }
+
+        // Exchange 10 ₽ -> 2 🎫
+        function openExchangeModal() {
+            document.getElementById('exchangeAmount').value = '';
+            document.getElementById('exchangePreview').textContent = 'Вы получите билетов: 0';
+            openModal('exchangeModal');
+        }
+
+        function incExchange(delta) {
+            const input = document.getElementById('exchangeAmount');
+            const current = parseInt(input.value || '0', 10);
+            let next = current + delta;
+            if (next < 0) next = 0;
+            input.value = String(next);
+            updateExchangeInfo();
+        }
+
+        function setExchangeMax() {
+            const max = Math.floor(appData.user.balance / 10) * 10;
+            document.getElementById('exchangeAmount').value = String(max);
+            updateExchangeInfo();
+        }
+
+        function updateExchangeInfo() {
+            const val = parseInt(document.getElementById('exchangeAmount').value || '0', 10);
+            const tickets = Math.floor(val / 10) * 2;
+            document.getElementById('exchangePreview').textContent = `Вы получите билетов: ${tickets}`;
+        }
+
+        function performExchange() {
+            let amount = parseInt(document.getElementById('exchangeAmount').value || '0', 10);
+            if (!Number.isFinite(amount) || amount <= 0) { showNotification('Введите сумму в рублях'); return; }
+            if (amount % 10 !== 0) { showNotification('Сумма должна быть кратна 10 ₽'); return; }
+            if (amount > appData.user.balance) { showNotification('Недостаточно средств'); return; }
+            const tickets = Math.floor(amount / 10) * 2;
+            appData.user.balance -= amount;
+            appData.user.tickets += tickets;
+            // синхронизация с users
+            const user = appData.users.find(u => u.id === appData.user.id);
+            if (user) {
+                user.balance = appData.user.balance;
+                user.tickets = appData.user.tickets;
+                user.lastActive = new Date().toISOString();
+            }
+            saveData();
+            updateUI();
+            closeModal('exchangeModal');
+            showNotification(`Обмен выполнен: −${amount} ₽, +${tickets} 🎫`);
+        }
+
+        // Admin panel
+        function toggleAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            const shown = panel.classList.contains('show');
+            if (shown) {
+                panel.classList.remove('show');
+                panel.style.display = 'none';
+            } else {
+                updateAdminStats();
+                panel.style.display = 'block';
+                panel.classList.add('show');
+            }
+        }
+
+        function updateAdminStats() {
+            const totalBalance = appData.users.reduce((s, u) => s + (u.balance || 0), 0);
+            document.getElementById('adminUserCount').textContent = appData.users.length;
+            document.getElementById('adminTotalBalance').textContent = totalBalance;
+        }
+
+        function showUserManagement() {
+            if (!appData.users.length) { alert('Пользователи не найдены'); return; }
+            let list = 'Выберите пользователя:\n\n';
+            appData.users.forEach((u, i) => {
+                list += `${i + 1}. ${u.name} (ID: ${u.id})\n   Баланс: ${u.balance || 0} ₽\n   Билеты: ${u.tickets || 0} 🎫\n\n`;
+            });
+            const idx = parseInt(prompt(list + 'Введите номер пользователя:'), 10) - 1;
+            if (Number.isInteger(idx) && idx >= 0 && idx < appData.users.length) manageSpecificUser(appData.users[idx]);
+        }
+
+        function manageSpecificUser(user) {
+            const action = prompt(`Управление: ${user.name}\n\n1 - Добавить баланс\n2 - Списать баланс\n3 - Добавить билеты\n4 - Переименовать\n5 - Удалить\n\nВведите номер:`);
+            switch (action) {
+                case '1': {
+                    const add = parseInt(prompt('Сколько ₽ добавить?'), 10);
+                    if (add > 0) { user.balance = (user.balance || 0) + add; syncUser(user); alert(`Добавлено ${add} ₽`); }
+                    break;
+                }
+                case '2': {
+                    const sub = parseInt(prompt('Сколько ₽ списать?'), 10);
+                    if (sub > 0) { user.balance = Math.max(0, (user.balance || 0) - sub); syncUser(user); alert(`Списано ${sub} ₽`); }
+                    break;
+                }
+                case '3': {
+                    const addT = parseInt(prompt('Сколько билетов добавить?'), 10);
+                    if (addT > 0) { user.tickets = (user.tickets || 0) + addT; syncUser(user); alert(`Добавлено ${addT} 🎫`); }
+                    break;
+                }
+                case '4': {
+                    const name = prompt('Новое имя:', user.name) || user.name;
+                    user.name = name;
+                    syncUser(user);
+                    break;
+                }
+                case '5': {
+                    if (confirm('Удалить пользователя?')) {
+                        appData.users = appData.users.filter(u => u.id !== user.id);
+                        if (appData.user.id === user.id) {
+                            // recreate current
+                            appData.user = { id: Date.now(), name: 'ГОСТЬ', balance: 0, tickets: 0 };
+                            appData.users.push({ ...appData.user, lastActive: new Date().toISOString() });
+                        }
+                        saveData();
+                        updateAdminStats();
+                        updateUI();
+                    }
+                    break;
+                }
+            }
+        }
+
+        function syncUser(user) {
+            if (user.id === appData.user.id) {
+                appData.user.balance = user.balance || 0;
+                appData.user.tickets = user.tickets || 0;
+                appData.user.name = user.name || appData.user.name;
+            }
+            const u = appData.users.find(x => x.id === user.id);
+            if (u) {
+                u.balance = user.balance || 0;
+                u.tickets = user.tickets || 0;
+                u.name = user.name || u.name;
+                u.lastActive = new Date().toISOString();
+            }
+            saveData();
+            updateAdminStats();
+            updateUI();
+        }
+
+        window.addEventListener('load', () => {
+            loadData();
+            updateUI();
+        });
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="coin-icon">▲</div>
+            <div>Система Активностей</div>
+        </div>
+        <div class="header-actions">
+            <div class="admin-indicator" title="Админ панель" onclick="toggleAdminPanel()">👑</div>
+            <button class="header-btn" onclick="location.reload()">⟲</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="user-info">
+            <div class="user-name" id="userName">ГОСТЬ</div>
+            <div class="balance-section">
+                <div class="balance-item"><span>ВАШ БАЛАНС:</span><div class="coin-icon">₽</div><span class="balance-value" id="balance">0</span></div>
+                <div class="balance-item"><span>БИЛЕТОВ:</span><div class="ticket-icon">🎫</div><span class="balance-value" id="tickets">0</span></div>
+            </div>
+        </div>
+
+        <div class="grid-section">
+            <div class="grid-item" onclick="openExchangeModal()">
+                <div class="grid-icon">💱</div>
+                <div class="grid-title">ОБМЕН РУБЛЕЙ НА БИЛЕТЫ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-title">👑 АДМИН ПАНЕЛЬ</div>
+        <div class="detailed-stats">
+            <div class="stat-row"><span>Всего пользователей:</span><span id="adminUserCount">0</span></div>
+            <div class="stat-row"><span>Общий баланс:</span><span id="adminTotalBalance">0</span></div>
+        </div>
+        <div class="admin-actions">
+            <button class="admin-btn" onclick="showUserManagement()">👥 Управление пользователями</button>
+            <button class="admin-btn" onclick="toggleAdminPanel()">❌ Закрыть панель</button>
+        </div>
+    </div>
+
+    <!-- Exchange Modal -->
+    <div class="modal" id="exchangeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ОБМЕН РУБЛЕЙ НА БИЛЕТЫ</div>
+                <button class="close-btn" onclick="closeModal('exchangeModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:8px; color: var(--muted); font-weight: 700;">Курс: 10 ₽ → 2 🎫</div>
+                <div class="promo-form">
+                    <div style="display:flex; gap:8px;">
+                        <button class="promo-submit" style="min-width:70px;" onclick="incExchange(-10)">−10 ₽</button>
+                        <input type="number" class="promo-input" id="exchangeAmount" min="0" step="10" placeholder="Сумма в ₽ (кратно 10)" oninput="updateExchangeInfo()">
+                        <button class="promo-submit" style="min-width:70px;" onclick="incExchange(10)">+10 ₽</button>
+                        <button class="promo-submit" style="min-width:70px;" onclick="setExchangeMax()">MAX</button>
+                    </div>
+                    <div id="exchangePreview" style="color: var(--muted); font-weight: 700;">Вы получите билетов: 0</div>
+                    <button class="promo-submit" onclick="performExchange()">ОБМЕНЯТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
